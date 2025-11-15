@@ -1,0 +1,18 @@
+Networking Notes
+
+arp -a
+ -> command prompt command that shows the arp table
+
+ARP(Adrees Resolution Protocol)
+ -> the Address Resolution Protocol (ARP) is a communication protocol for discovering the link layer address, such as a MAC address, associated with an internet layer address, typically an IPv4 address.
+
+CAM(Content Addressable Memory)
+ -> used by Cisco switches
+ ->
+
+CISCO commands
+ -> do write
+ -> line 
+ -> server password-encyption
+ ->ip address ip_adress_name subnet_mask\
+ -> no shutdown

@@ -1,0 +1,23 @@
+.SaveChangesAysnc() 
+	-> it's only used for putting or changing data into a database, NEVER use it with a GET method
+!Always check if something is null, some methods bypass try & catch and must be checked with an if!
+
+.FirstorDefault()
+	->returns the first value that matches the lamda condition between () or null if there is none
+	->it's a sync method (not well used with aysnc functions, because it will block the worker thread)
+	->when using an aysnc function use .FirstorDefaultAsync()
+
+!Blocking the Working Thread!
+ ->the thread is used for exclusively for the specific task and can't be used for anything else
+		(like a waiter who puts an order and then waits until the order is complete) 
+ ->a server has a finite amount of working threads, so when most of them(if not all are synced), 
+		it will soon run out of "waiters"(working threads) to take the "orders"(HTTP Requests)
+ ->using an async methods solves this problem somewhat, given the fact that when a thread is given a specifc task, it can be used for something else aswell
+		(like waiter who places and order and then goes back to place more orders; the order he places can be given to the customers by him, or other waiters)
+
+Sync VS Aysnc
+
+
+
+
+

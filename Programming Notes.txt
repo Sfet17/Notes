@@ -1,0 +1,15 @@
+Eager Loading 
+ -> loads all the necessary data, including related data, without waiting for it to be requested
+ -> beneficial for performance as it reduces the number of database calls needed
+
+Ex: 
+	var userPermission = await context.UserPermissions
+					.Include(x => x.Permission)
+					.FirstOrDefaultAsync(x => x.UserId == userId && x.Permission.Name == permissionName)
+
+			->
+			->
+			->
+			->
+			->
+
