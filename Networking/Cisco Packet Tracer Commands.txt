@@ -1,0 +1,74 @@
+======Setting up a Hostname(Configuring Global Parameters)======
+ ->enable 
+ -># configure terminal 
+ -># hostname name 
+ -># enable secret password_name   //sets up an encrypted password(it doesn't show what u type) || enable password password_name(it shows what password you type) not encypted
+ -># no ip domain-lookup
+
+----no ip domain-lookup---
+ -> by default cisco devices have  ip domain-lookup enabled => when it doesn't recognize a command or a name it assumes it's a hostname and it tries to connect to it
+ -> by enabling no ip domain-lookup it allows cisco devices to stop searching for a hostname that doesn't exist(it's a quality of life command to correct typos or invalid commands)
+
+================================================================
+
+
+=======Setting up A Banner Message======
+ ->banner motd "any symbol that doesn't repeat in the message we want to display"
+	'the message we want to display "ending with that character that doesn't show up in the message at all"'
+ ->banner motd == Banner Message Of The Day
+ ->Ex: banner motd "
+	I'm going to school!"
+ ->in order to save these changes we need to run the following command:
+	->copy running-config startup-config   //it copies the changes we made in the current session(running-config) to the startup config(that runs first when a device boots up)
+ !!!We have to end the session before saving it to the startup config (run the command "end" in the current session to exit back to Privileged EXEC)!!!
+ -> used for post legal warrnings like  "Unautherized Access Is Prohibited!"
+=======================================
+
+======Setting Command Line Access======
+
+ -> configure terminal
+ -> line [aux | console | tty | vty] line-number
+ -> password password_name
+ -> login
+ -> exec-timeout minutes
+ -> end 
+
+
+-----Securing the serial console port------
+
+ -> configure terminal
+ -> line console 0
+ -> password Doof
+ -> login
+ -> exec-timeout 1
+ -> end
+------------------------------------------
+
+======================================
+
+
+======Setting up the Default Gateway on a Router======
+
+ -> enable
+ -> conf t
+ -> interface GigabitEthernet n/0		//n varies depending on how many networks we want to create a default gateway for; starting with 0
+ -> ip address (ip address of the network we want to create the default gateway for) (the subnet mask of that network)
+ -> description (something that describes that network, a name)
+ -> no shutdown
+ -> end
+ -> copy running-config startup-config
+
+
+======================================================
+
+======Configuring a Switch======
+
+ -> enable
+ -> conf t
+ -> interface vlan 1
+ -> ip address (ip address of the switch) (subnet mask of the network)
+ -> no shutdown
+ -> exit
+ -> ip default-gateway (the default gateway for the network)
+================================
+
