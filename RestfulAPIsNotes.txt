@@ -1,21 +1,175 @@
-.SaveChangesAysnc() 
-	-> it's only used for putting or changing data into a database, NEVER use it with a GET method
-!Always check if something is null, some methods bypass try & catch and must be checked with an if!
+=============================================================================================================================            
+var grantPermissions = dto.Select(x => entityPermissionManager.GrantStudioPermissionAsync(
+                x.Permission,
+                x.UserId,
+                x.StudioId,
+                accountId.Value
+                ));
+            await Task.WhenAll(grantPermissions);
 
-.FirstorDefault()
-	->returns the first value that matches the lamda condition between () or null if there is none
-	->it's a sync method (not well used with aysnc functions, because it will block the worker thread)
-	->when using an aysnc function use .FirstorDefaultAsync()
+ 
+1. .Select() -> dosent execute async methods but it creates a collection of tasks => IEnumerable<Task> grantPermissions
+   "x => entityPermissionManager.GrantStudioPermissionAsync(values)" -> returns a task granting a specific permission for a specific user on a specific studio from a specific account
+2."await Task.WhenAll(grantPermissions)" -> waits for all the tasks to complete(given the code there are 2 one that selects and creates the IEnumerable<Task> grantPermissions
+						and the other one that does the logic of given the permission from a specific account to a specific user on a specific studio)
+					 -> it also throw an expection if a task or all task fail or run the task concurrently
 
-!Blocking the Working Thread!
- ->the thread is used for exclusively for the specific task and can't be used for anything else
-		(like a waiter who puts an order and then waits until the order is complete) 
- ->a server has a finite amount of working threads, so when most of them(if not all are synced), 
-		it will soon run out of "waiters"(working threads) to take the "orders"(HTTP Requests)
- ->using an async methods solves this problem somewhat, given the fact that when a thread is given a specifc task, it can be used for something else aswell
-		(like waiter who places and order and then goes back to place more orders; the order he places can be given to the customers by him, or other waiters)
+Summary: for each dto it creates a method that grants a permission to a studio, store all those permissions into a list of tasks, run all the permissions at the same time
+	 wait for all the permissions to be granted to continue.
 
-Sync VS Aysnc
+The moment you see a .FirstOrDefault(), .Contains(), or .Any() inside a foreach loop, you should immediately think: "Can I convert the inner list (listB) into a Dictionary or HashSet before the loop starts?"
+	-> for reducing complexity and make it more optimized
+	
+Idempotency
+ -> an operation that is idempotent can be called multiple times without changing the result beyond the first application.
+=============================================================================================================================
+
+=============================================================================================================================
+        public async Task<CachedPermissionsDto> GetUserPermissions(string userId)
+        {
+	    //cretes a guid for the user, a unique string	
+            var key = GetUserPermissionCacheKey(userId);
+		//tries to get the permissions with that guid from the cache
+            var cachedPermissions = cacheProvider.GetFromCache<CachedPermissionsDto>(key);
+		//verifies if they exist, if they do, it gets them from here and the logic stops
+            if (cachedPermissions != null)
+            {
+                return cachedPermissions;
+            }
+            var user = await userManager.FindByIdAsync(userId);
+		//tries to find if the user exists, if it doesn't the logic stops and the program throws an exception
+            if (user == null)
+            {
+                throw new NotFoundException(ErrorMessageHelper.GetEntityDoesNotExistErrorMessage("User", userId));
+            }
+		//creates the neccessary values for the upincomming dto
+		//fethes by running several queries to get different slices of data associeted with the userID
+            var isOwner = await userManager.IsInRoleAsync(user, UserRolesConstants.EnterpriseOwner);
+            var userPermissions = await userPermissionsRepository.GetAllByUserId(userId);
+            var casinoPermissions = await casinoPermissionsRepository.GetAllByUserId(userId);
+            var studioPermissions = await studioPermissionRepository.GetAllByUserId(userId);
+		//maps personal information into a dto, that is secure to be sent around
+            var userPermissionsDtos = mapper.Map<List<UserCachedPermissionDto>>(userPermissions);
+            var casinoPermissionsDtos = mapper.Map<List<CasinoCachedPermissionDto>>(casinoPermissions);
+            var studioPermissionsDtos = mapper.Map<List<StudioCachedPermissionDto>>(studioPermissions);
+            var dto = new CachedPermissionsDto
+            {
+                EnterpriseAccountId = user.AccountId.Value,
+                IsOwner = isOwner,
+                UserPermissions = userPermissionsDtos,
+                CasinoPermissions = casinoPermissionsDtos,
+                StudioPermissions = studioPermissionsDtos
+            };
+		//puts the newly created dto in the cache for easier access
+            cacheProvider.SetCache(key, dto);
+		//retruns that said dto
+            return dto;
+        }
+
+	->What id does?
+		->it tries to get the userpermissions from cache, if they are not here, it will build the from scratch and return it
+
+
+=======================================================================================
+    public async Task <List<StudioPermission>> GetStudioPermissions (int studioId)
+    {
+        return await context.StudioPermissions
+                        .Include(sp => sp.User)
+                        .Where(p => p.StudioId == studioId)
+                        .ToListAsync();
+    }
+=======================================================================================
+
+=============================================================================================================================
+GetAllStudioPermissions
+ -> i want to know what type of permissions does a user have on a studio with studioId of x
+ -> get them from the databse
+ -> return a dto with the required fields (permissionName, studioId, object user(with it's fields))
+
+    public async Task<List<StudioPermissionDto>> GetStudioPermissions(int studioId)
+    {
+        //getting the studio with the studioId
+        var studio = await studioManager.GetStudioById(studioId);
+        //verify if the studio exists
+        if (studio == null)
+        {
+            throw new NotFoundException(ErrorMessageHelper.GetEntityDoesNotExistErrorMessage("Studio", studioId));
+        }
+        //getting the users by querrying the studioPermissionRepo: Who has permissions for this studio? from the database
+        var permissions = await studioPermissionRepository.GetStudioPermissions(studioId);
+        //creating the dto with permissionName,studioId and the object user(with Id, FirstName, LastName, UserName)
+        !var permissionDtoList = permissions.Select(p => new StudioPermissionDto
+        {
+            StudioId = p.StudioId,
+            Permission = p.Permission.Name,
+            Users = new UserDto
+            {
+                UserId = p.User.Id,
+                FirstName = p.User.FirstName,
+                LastName = p.User.LastName,
+                UserName = p.User.UserName,
+
+            } 
+        }).ToList();
+        //return the dtoList
+        return permissionDtoList;
+    }
+
+    public async Task <List<StudioPermission>> GetStudioPermissions (int studioId)
+    {
+        //querrying the question What user has permissions on this studio?
+        return await context.StudioPermissions
+                        .Include(sp => sp.User)
+                        .Where(p => p.StudioId == studioId)
+                        .ToListAsync();
+    }
+=============================================================================================================================
+
+=================================================================================================	
+int? accountId = (int?)HttpContext.Items[HttpContextItemKeys.AccountIdKey];
+        if (!accountId.HasValue)
+        {
+            ModelState.AddModelError("User", ErrorMessageHelper.GetUserNotFoundErrorMessage());
+            return ValidationProblem(ModelState);
+        }
+=================================================================================================
+
+=============================================================================================================================
+ public async Task RevokeStudioPermissionAsync(string userId, string permissionName, int studioId, int accountId)
+ {
+     var callingUserId = identityService.GetUserId();
+     var user = await userRepository.GetById(userId);
+     if (user == null || user.AccountId != accountId)
+     {
+         throw new InvalidOperationException(ErrorMessageHelper.GetEntityDoesNotExistErrorMessage("User", userId));
+     }
+
+     var hasPermission = await cachedPermissionsManager.VerifyUserHasPermissionAsync(callingUserId, accountId, UserPermissionsConstant.ManageUsers);
+     if (!hasPermission)
+     {
+         throw new PermissionNotGrantedException(ErrorMessageHelper.GetPermissionNotGrantedErrorMessage(callingUserId, UserPermissionsConstant.ManageUsers));
+     }
+
+     var permission = await entityPermissionRepository.GetByNameAsync(permissionName);
+     if(permission == null)
+     {
+         throw new InvalidOperationException(ErrorMessageHelper.GetNotFoundErrorMessageByName("Permission", permissionName));
+     }
+
+     var studio = await studioRepository.GetByIdAndEnterpriseAccountIdAsync(studioId, accountId);
+     if (studio == null)
+     {
+         throw new InvalidOperationException(ErrorMessageHelper.GetNotFoundErrorMessageById("Studio", studioId));
+     }
+     var permissionExists = await cachedPermissionsManager.VerifyUserHasStudioPermissionAsync(userId, studioId, accountId, permissionName);
+     if (permissionExists)
+     {            
+         var studioPermission = await studioPermissionRepository.GetStudioPermissionByUserIdStudioIdAndId(userId, studioId, permission.Id);
+         await studioPermissionRepository.Remove(studioPermission);
+         cachedPermissionsManager.InvalidateUserPermissionsCache(userId);
+     }
+ }
+=============================================================================================================================
 
 
 
