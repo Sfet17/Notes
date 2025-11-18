@@ -1,16 +1,23 @@
-Networking Notes
-
-
 ======OSI Model======
-
+ -> 7.Application
+ -> 6.Presentation
+ -> 5.Session
+ -> 4.Transport
+ -> 3.Network
+ -> 2.Data Link
+ -> 1.Physical Access
 =====================
 
 ======TCP/IP Model======
-
+ -> 4.Application
+ -> 3.Transport
+ -> 2.Network
+ -> 1.Network Access
 ========================
 
 ======ARP(Address Resolution Protocol)======
  -> the Address Resolution Protocol (ARP) is a communication protocol for discovering the link layer address, such as a MAC address, associated with an internet layer address, typically an IPv4 address.
+ -> it's LOCAL, if it want to find a device from a different network, it will asign the ip addres and the mac address of the router embedded in the local network.(it maps the default gateway)
 
 ======ARP Table======
  -> contains combinations between IP addresses and MAC addresses
@@ -20,37 +27,41 @@ Networking Notes
 
 
 ======CAM(Content Addressable Memory)======
- -> used by Cisco switches
- ->
+ -> Content Addressable Memory which is a special type of memory used by Cisco switches that returns the address where the data is stored.
+ -> best for creating tables that search the exact values, such as MAC address tables (CAM Tables)
+ -> faster than RAM since the search the enitre memory in one opperation
 ======CAM Table======
-
+ -> they can only provide two result true(1) or false (0)
+ ->
 =====================
 
 ===========================================
 
-==================CISCO commands==================
- -> line 
- -> server password-encyption
- -> Ip address ip_adress_name subnet_mask\
- -> no shutdown
-==================================================
 
 =======TCP(Transmission Control Protocol)=======
+
  -> fundamental networking protocol that ensures reliable transmission of data between devices or applications on a network
  -> establishes a connection, breaks data into packets and makes sure the data is sent in the correct order, 
 		without errors by using retransmission requests(resends the package if it doesn't receive a confirmation from the receiver in a specific time ) and error correction
  -> works with the IP(Internet Protocol) being essential for web apps, emails and file transfers on a network
  -> it is part of the transport layer
 
-
-
 ======ICMP(Internet Control Message Protocol)======
- ->
 
 ===================================================
 
 
 ======HTTP(HyperText Transfer Protocol)======
-
+ ->
 =============================================
 
+
+======MAC Address======
+ -> it's a unique identifie given to a device that it's used by switches, in a local network, to find where a device is(logically). 
+ -> format: six groups of 2 hexadecimal numbers
+ 	->Ex: FF.FF.FF.FF.FF.FF  <- this is actually the boradcast MAC address  
+=======================
+
+======IPv4 Address======
+ ->
+========================
