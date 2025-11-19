@@ -86,6 +86,8 @@ GetAllStudioPermissions
  -> get them from the databse
  -> return a dto with the required fields (permissionName, studioId, object user(with it's fields))
 
+V1
+-------------------------------------------------------------------------------------------------------------------------
     public async Task<List<StudioPermissionDto>> GetStudioPermissions(int studioId)
     {
         //getting the studio with the studioId
@@ -114,6 +116,27 @@ GetAllStudioPermissions
         //return the dtoList
         return permissionDtoList;
     }
+-------------------------------------------------------------------------------------------------------------------------
+
+V2
+-------------------------------------------------------------------------------------------------------------------------
+    public async Task<List<StudioPermissionDto>> GetStudioPermissions(int studioId, int accountId)
+    {
+        //getting the studio with the studioId
+        //var callingUserId = identityService.GetUserId();
+        var studio = await studioRepository.GetByIdAndEnterpriseAccountIdAsync(studioId, accountId);
+        //verify if the studio exists
+        if (studio == null)
+        {
+            throw new NotFoundException(ErrorMessageHelper.GetEntityDoesNotExistErrorMessage("Studio", studioId));
+        }
+        //getting the users by querrying the studioPermissionRepo: Who has permissions for this studio? from the database
+        var permissions = await studioPermissionRepository.GetStudioPermissionsByStudioId(studioId);
+        //creating the dto with permissionName,studioId and the object user(with Id, FirstName, LastName, UserName)
+        var permissionDtoList = mapper.Map<List<StudioPermissionDto>>(permissions);
+        //return the dtoList
+        return permissionDtoList;
+    }
 
     public async Task <List<StudioPermission>> GetStudioPermissions (int studioId)
     {
@@ -123,6 +146,8 @@ GetAllStudioPermissions
                         .Where(p => p.StudioId == studioId)
                         .ToListAsync();
     }
+-------------------------------------------------------------------------------------------------------------------------
+
 =============================================================================================================================
 
 =================================================================================================	
@@ -169,6 +194,180 @@ int? accountId = (int?)HttpContext.Items[HttpContextItemKeys.AccountIdKey];
          cachedPermissionsManager.InvalidateUserPermissionsCache(userId);
      }
  }
+=============================================================================================================================
+
+=============================================================================================================================
+
+--------------------------------------------------------------------------------------------------------------------
+  [HttpPost("add-studio-permissions")]
+  public async Task<ActionResult> AddStudioPermissionBulk([FromBody] List<StudioPermissionDto> dto)
+  {
+      try
+      {
+          int? accountId = (int?)HttpContext.Items[HttpContextItemKeys.AccountIdKey];
+          if (!accountId.HasValue)
+          {
+              ModelState.AddModelError("User", ErrorMessageHelper.GetUserNotFoundErrorMessage());
+              return ValidationProblem(ModelState);
+          }
+          var grantPermissions = dto.Select(x => entityPermissionManager.GrantStudioPermissionAsync(
+              x.UserId,
+              x.Permission,
+              x.StudioId,
+              accountId.Value
+              ));
+          await Task.WhenAll(grantPermissions);
+          return Ok();
+      }
+      catch (NotFoundException e)
+      {
+          return NotFound(e.Message);
+      }
+      catch (Exception e)
+      {
+          if (e.Source == null) return ValidationProblem(ModelState);
+
+          ModelState.TryAddModelError(e.Source, e.Message);
+
+          if (e.InnerException?.Source != null)
+              ModelState.TryAddModelError(e.InnerException.Source, e.InnerException.Message);
+
+          return ValidationProblem(ModelState);
+      }
+  }
+--------------------------------------------------------------------------------------------------------------------
+    [HttpPost("add-studio-permissions")]
+    public async Task<ActionResult> AddStudioPermissionBulk([FromBody] StudioPermissionsBulkDto dto)
+    {
+        try
+        {
+            int? accountId = (int?)HttpContext.Items[HttpContextItemKeys.AccountIdKey];
+            if (!accountId.HasValue)
+            {
+                ModelState.AddModelError("User", ErrorMessageHelper.GetUserNotFoundErrorMessage());
+                return ValidationProblem(ModelState);
+            }
+            await entityPermissionManager.AddStudioPermissionsBulk(dto, accountId.Value);
+            return Ok();
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            if (e.Source == null) return ValidationProblem(ModelState);
+
+            ModelState.TryAddModelError(e.Source, e.Message);
+
+            if (e.InnerException?.Source != null)
+                ModelState.TryAddModelError(e.InnerException.Source, e.InnerException.Message);
+
+            return ValidationProblem(ModelState);
+        }
+    }
+--------------------------------------------------------------------------------------------------------------------
+
+=============================================================================================================================
+
+ public async Task AddStudioPermissionsBulk(StudioPermissionsBulkDto dto, int accountId)
+ {
+     List<StudioPermission> permissionsToAdd = [];
+     var uniquePermissionsNames = dto.PermissionNames.ToHashSet();
+     var permissions = await entityPermissionRepository.GetManyByNameAsync(uniquePermissionsNames);
+     if (uniquePermissionsNames.Count != permissions.Count)
+     {
+         var missingPermissions = uniquePermissionsNames.Where(up => !permissions.Any(p => p.Name == up));
+         throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingNamesMessage("EntityPermission", missingPermissions));
+     }
+     var uniqueUserIds = dto.UserIds.ToHashSet();
+     var users = await userRepository.GetManyByIds(uniqueUserIds);
+
+     if (uniqueUserIds.Count != users.Count)
+     {
+         var missingUsers = uniqueUserIds.Where(uu => !users.Any(u => u.Id == uu));
+         throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingIdsMessage("User", missingUsers));
+     }
+
+     var uniqueStudioIds = dto.StudioIds.ToHashSet();
+     var studios = await studioRepository.GetManyByIdsAndEnterpriseAccountIdAsync(accountId, uniqueStudioIds);
+
+     if (uniqueStudioIds.Count != studios.Count)
+     {
+         var missingStudios = uniqueStudioIds.Where(us => !studios.Any(s => s.Id == us));
+         throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingIdsMessage("Studio", missingStudios));
+     }
+     var affectedUserIds = new HashSet<string>();
+
+     foreach (var userId in uniqueUserIds)
+     {
+         foreach (var studioId in uniqueStudioIds)
+         {
+             foreach (var permissionName in uniquePermissionsNames)
+             {
+                 var permission = permissions.First(p => p.Name == permissionName);
+                 var permissionExists = await cachedPermissionsManager.VerifyUserHasStudioPermissionAsync(userId, studioId, accountId, permissionName);
+                 if (!permissionExists)
+                 {
+                     var studioPermission = new StudioPermission()
+                     {
+                         UserId = userId,
+                         StudioId = studioId,
+                         EntityPermissionId = permission.Id,
+                     };
+                     permissionsToAdd.Add(studioPermission);
+                     affectedUserIds.Add(userId);
+                 }
+             }
+         }
+     }
+     if (permissionsToAdd.Count != 0)
+     {
+         await studioPermissionRepository.AddManyAsync(permissionsToAdd);
+         foreach(var userId in affectedUserIds)
+         {
+             cachedPermissionsManager.InvalidateUserPermissionsCache(userId);
+         }
+     }
+ }
+
+ Schema:
+START AddStudioPermissionsBulk(DTO)
+  │
+  ├──> 1. VALIDATION PHASE (The "Sanity Checks")
+  │      │
+  │      ├──> Check Permissions: Do all PermissionNames exist in DB?
+  │      │       └──> [NO] ──> THROW NotFound (Stop immediately)
+  │      │
+  │      ├──> Check Users: Do all UserIds exist in DB?
+  │      │       └──> [NO] ──> THROW NotFound
+  │      │
+  │      └──> Check Studios: Do all StudioIds exist AND belong to AccountId?
+  │              └──> [NO] ──> THROW NotFound
+  │
+  ├──> 2. PROCESSING PHASE (The "Cartesian Product")
+  │      │
+  │      └──> LOOP: For Every User...
+  │             └──> LOOP: For Every Studio...
+  │                    └──> LOOP: For Every Permission...
+  │                           │
+  │                           ├──> CHECK: Does this User already have this specific access?
+  │                           │       ├──> [YES] ──> Skip (Don't duplicate)
+  │                           │       └──> [NO]  ──> Create Object & Add to "To-Save" List
+  │                           │                      Mark User as "Affected"
+  │
+  ├──> 3. EXECUTION PHASE (The "Commit")
+  │      │
+  │      ├──> Is the "To-Save" List empty?
+  │      │       ├──> [YES] ──> Return (Nothing to do)
+  │      │       └──> [NO]  ──> SAVE List to Database (Bulk Insert)
+  │      │
+  │      └──> LOOP: For Every "Affected" User...
+  │              └──> Invalidate Cache (Force refresh on next login)
+  │
+  └──> END
+
+		
 =============================================================================================================================
 
 
