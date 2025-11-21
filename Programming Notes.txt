@@ -39,3 +39,10 @@ Batch Processing/Bulk Insert
 ----------------------------
 
 ========================================================================
+
+========================================================================
+Cache vs Database
+-------------------
+ -> i had a bug now where my code was looking in the cache but not in the database so it would add the same thing more times(a permission someone should only have once, it the cache it wasnt but it the database it was and it kept adding it)
+ -> very importnat to invalidate the cache so that the databse and the cache are synced up
+========================================================================

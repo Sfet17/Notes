@@ -370,6 +370,40 @@ START AddStudioPermissionsBulk(DTO)
 		
 =============================================================================================================================
 
+=============================================================================================================================
+ [HttpGet("studio-permissions/user/{userId}")]
+ public async Task<ActionResult<List<StudioCachedPermissionDto>>> GetAllUserStudioPermissions(string userId)
+ {
+     try
+     {
+         int? accountId = (int?)HttpContext.Items[HttpContextItemKeys.AccountIdKey];
+         if (!accountId.HasValue)
+         {
+             ModelState.AddModelError("User", ErrorMessageHelper.GetUserNotFoundErrorMessage());
+             return ValidationProblem(ModelState);
+         }
+         var permissions = await cachedPermissionsManager.GetUserPermissions(userId);
+         return Ok(permissions.StudioPermissions); 
+     }
+     catch (NotFoundException e)
+     {
+         return NotFound(e.Message);
+     }
+     catch (Exception e)
+     {
+         if (e.Source == null) return ValidationProblem(ModelState);
+
+         ModelState.TryAddModelError(e.Source, e.Message);
+
+         if (e.InnerException?.Source != null)
+             ModelState.TryAddModelError(e.InnerException.Source, e.InnerException.Message);
+
+         return ValidationProblem(ModelState);
+     }
+ }
+
+=============================================================================================================================
+
 
 
 
