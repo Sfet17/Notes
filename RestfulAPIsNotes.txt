@@ -405,8 +405,143 @@ START AddStudioPermissionsBulk(DTO)
 =============================================================================================================================
 
 
+=============================================================================================================================
+        
+public async Task<bool> VerifyUserHasPermissionAsync(string userId, int enterpriseAccountId, string permissionName)
+        {
+            var userPermissions = await GetUserPermissions(userId);
+            var isOwner = userPermissions.IsOwner && userPermissions.EnterpriseAccountId == enterpriseAccountId;
+            return isOwner || userPermissions.UserPermissions.Any(p => p.PermissionName == permissionName);
+        }
+=============================================================================================================================
 
 
+=============================================================================================================================
+//function that returns all users
+public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+{
+
+    return await _context.Users
+                   .AsNoTracking() //it tells enity framework not to add the data to the change tracker(since i don't change any data here, it improves performance)
+                   .Select/*maps the database entity to my dto(!it prevents over-fetching data that should't be sent)*/
+                   ( u => new UserDto
+                   {
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        UserName = u.UserName,
+                        Email = u.Email,
+
+                   }).ToListAsync();//executes the querry async and returns the reuslt
+=============================================================================================================================
+}
+
+
+=============================================================================================================================
+public async Task RemoveCasinoPermissionsBulk(CasinoPermissionsBulkDto dto, int accountId)
+{
+    List<int> permissionIdsToRemove = [];
+    //change here added callingUserId and hasPermission
+    var callingUserId = identityService.GetUserId();
+    var hasPermission = await cachedPermissionsManager.VerifyUserHasPermissionAsync(callingUserId,accountId, UserPermissionsConstant.ManageUsers);
+    if(!hasPermission)
+    {
+        throw new PermissionNotGrantedException(ErrorMessageHelper.GetPermissionNotGrantedErrorMessage(callingUserId, UserPermissionsConstant.ManageUsers));
+    }
+    var uniquePermissionNames = dto.PermissionNames.ToHashSet();
+    var affectedUsersIds = new HashSet<string>();
+    var permissions = await entityPermissionRepository.GetManyByNameAsync(uniquePermissionNames);
+    if(uniquePermissionNames.Count != permissions.Count)
+    {
+        var missingPermissions = uniquePermissionNames.Where(up => !permissions.Any(p =>p.Name == up));
+        throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingNamesMessage("EntityPermission", missingPermissions));
+    }
+    
+    var uniqueUserIds = dto.UserIds.ToHashSet();
+    var users = await userRepository.GetManyByIds(uniqueUserIds);
+    if(uniqueUserIds.Count != users.Count)
+    {
+        var missingUsers = uniqueUserIds.Where(uu => !users.Any(u => u.Id == uu));
+        throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingIdsMessage("User", missingUsers));
+    }
+
+    var uniqueCasinoIds = dto.CasinoIds.ToHashSet();
+    var casinos = await casinoRepository.GetManyByIdsAndEnterpriseAccountIdAsync(accountId, uniqueCasinoIds);
+    if (uniqueCasinoIds.Count != casinos.Count)
+    {
+        var missingCasino = uniqueCasinoIds.Where(uc => casinos.Any(c => c.Id == uc));
+        throw new NotFoundException(ErrorMessageHelper.GetMultipleMissingIdsMessage("Casinos", uniqueCasinoIds));
+    }       
+    
+    foreach(var userId in uniqueUserIds)
+    {
+        var existingUserPermissions = await cachedPermissionsManager.GetUserPermissions(userId);
+        foreach (var casinoId in uniqueCasinoIds)
+        {                
+            foreach (var permissionName in uniquePermissionNames)
+            {
+                var permission = permissions.FirstOrDefault(p => p.Name == permissionName);
+                var permissionToRemove = existingUserPermissions.CasinoPermissions
+                                         .FirstOrDefault(cp => cp.UserId == userId && cp.CasinoId == casinoId && cp.PermissionName == permissionName);
+                if (permissionToRemove != null)
+                {
+                    permissionIdsToRemove.Add(permissionToRemove.Id);
+                    affectedUsersIds.Add(userId);
+                }
+            }
+        }
+    }
+    if(permissionIdsToRemove.Count > 0)
+    {
+        await casinoPermissionRepository.RemoveAsync(permissionIdsToRemove);
+        foreach(var userId in affectedUsersIds)
+        {
+            cachedPermissionsManager.InvalidateUserPermissionsCache(userId);   
+        }
+    }
+}
+
+=============================================================================================================================
+
+=============================================================================================================================
+    public async Task<List<UserPermission>> GetAllByUserId(string userId)
+    {
+        var userPermissions = await context.UserPermissions
+            .Include(up => up.Permission)
+            .Include(u => u.User)
+            .Where(up => up.UserId == userId)
+            .ToListAsync();
+        return userPermissions;
+    }
+=============================================================================================================================
+
+
+=============================================================================================================================
+ public async Task<DashboardTab> EditUserDashboardTab(string userId, int dashboardTabId, DashboardTab updatedValues)
+ {
+     ArgumentNullException.ThrowIfNull(updatedValues);
+     var dashboard = await GetUserDashboard(userId);
+     var tabToEdit = dashboard.Tabs.FirstOrDefault(x => x.Id == dashboardTabId)
+                        ?? throw new NotFoundException("The tab you are trying to edit doesn't exist.");
+
+     // Update only the allowed fields
+     if (!string.IsNullOrWhiteSpace(updatedValues.Name))
+     {
+         // Optional: ensure no other tab has the same name (case-insensitive)
+         var duplicate = dashboard.Tabs.FirstOrDefault(t => t.Id != dashboardTabId && t.Name.ToLower() == updatedValues.Name.ToLower());
+         if (duplicate != null)
+             throw new System.Exception("A tab with the same name already exists.");
+
+         tabToEdit.Name = updatedValues.Name.Trim();
+     }
+
+     // Update Order (you might want to add validation here)
+     tabToEdit.Order = updatedValues.Order;
+
+     await context.SaveChangesAsync();
+     return tabToEdit;
+ }
+=============================================================================================================================
 
 
 

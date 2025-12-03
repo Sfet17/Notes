@@ -1,0 +1,26 @@
+==========================================================================================
+git add . vs git add *
+----------------------
+
+git add *
+ -> all the files that dont strat with . (like .gitignore)
+ -> it's the shell functionality => git only ever recieves a list of files
+
+git add .
+ -> adds the entire directory recursively
+ -> no special meaning for the shell 
+==========================================================================================
+
+==========================================================================================
+git add . vs git add -A vs git add -u
+
+git add .
+ -> stages the new and modified files only in the directory
+
+git add -A
+ -> stages all the files (new modified and deleted files) in the directory
+
+git add -u
+ -> stages all the modified and deleted files in the directory
+
+==========================================================================================

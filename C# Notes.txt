@@ -1,0 +1,44 @@
+Enumerable.Where Method
+
+.Where()
+ -> filters a sequence based on a predicate(function to verify each element for a condition)
+ -> return an IEnumrable that contains the elements that fit that condition
+
+Example: 
+List<string> fruits =
+    new List<string> { "apple", "passionfruit", "banana", "mango",
+                    "orange", "blueberry", "grape", "strawberry" };
+
+IEnumerable<string> query = fruits.Where(fruit => fruit.Length < 6);
+
+foreach (string fruit in query)
+{
+    Console.WriteLine(fruit);
+}
+/*
+ This code produces the following output:
+
+ apple
+ mango
+ grape
+*/
+
+.RemoveRange(Object)
+ -> tracks the given object in order to delete it from the database when SaveChanges() is applied.
+ -> removes items by index
+ -> retruns a void value
+
+.Remove(Object)
+ -> it does the exact same thing
+ -> removes an item by value
+ -> it returns a bool statement
+
+.ExecuteDelete()
+ -> deletes the data from the database directly without traking & selecting it 
+
+
+
+
+
+
+
