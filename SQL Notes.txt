@@ -1,0 +1,623 @@
+----------------------------------------------------------General Knowledge about SQl---------------------------------------------------
+ORM = Object Relational Mapping (tools that allow you to work with relational databases using the object oriented programing language)
+	examples: JavaScript -> Squelize; Python -> SQLAlchemy;
+Database Schema =  a blueprint that defines the diffrent rules and constraints in a database
+
+-----------------AUTO_INCREMENT--------------------
+
+ ->will increment from a specific position.
+ ->if not set up manually will start from 1.
+ 	Setting up Auto_increment
+ 		ALTER TABLE table_name
+ 		AUTO_INCREMENT = specific_value
+ 	Example: CREATE TABLE transactions(
+ 			id INT AUTO_INCREMENT,
+ 			amount DECIMAL,
+ 			customer_id INT
+ 			);
+ 		ALTER TABLE transactions
+ 		AUTO_INCREMENT = 1000;
+ 		
+---------------------------------------------------
+
+Unique =  the field must be unique;
+Not NULL = the field must be selected;
+Text =  a type of variable that can hold a string value of unspecified lenght
+Index = lookup table for specific columns;
+DECIMAL(x,y)= type of data used for real numbers where x=how many digits max & y = how accurate should the number be after '.';
+
+----------------------------------------------------------DISTINCT------------------------------------------------------------------
+
+->makes the data show only once even if it reapeats;
+	Example:
+				SELECT customer_id FROM transactions WHERE customer_id IS NOT NULL;
+								+-------------+
+								| customer_id |
+								+-------------+
+								|           1 |
+								|           1 |
+								|           2 |
+								|           2 |
+								|           3 |
+								+-------------+
+								
+
+			     SELECT DISTINCT customer_id FROM transactions WHERE customer_id IS NOT NULL;
+								+-------------+
+								| customer_id |
+								+-------------+
+								|           1 |
+								|           2 |
+								|           3 |
+								+-------------+					
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------INDEX--------------------------------------
+
+ ->Btree data structure used to find values within a specific column more quickly
+	Creating an index
+		CREATE INDEX index_name
+		ON table_name(columns that we want to create an index for);
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------Subquery-------------------------------------------------------------------------
+
+ ->a query whithin another query | query(subquery)
+ 	
+table used for examples:
+ 
+			 +-------------+------------+-------------+----------------------------+------------+------------+---------+
+			| employee_id | first_name | last_name   | email                      | hourly_pay | hire_date  | boss_id |
+			+-------------+------------+-------------+----------------------------+------------+------------+---------+
+			|           1 | Eugene     | Krabs       | spogebopfriend@gmail.com   |      26.85 | 2021-01-03 |    NULL |
+			|           2 | Squidward  | Tentacles   | spongebobfirend2@gmail.com |      31.89 | 2020-03-09 |       4 |
+			|           3 | Spogebob   | Squarepants | spongebobhimself@gmail.com |      59.87 | 2019-01-15 |       4 |
+			|           4 | Patrick    | Star        | spongebobfriend3@gmail.com |      32.09 | 2023-09-12 |       1 |
+			|           5 | Sheldon    | Plankton    | spongebobfriend4@gmail.com |      34.50 | 2024-03-23 |       4 |
+			+-------------+------------+-------------+----------------------------+------------+------------+---------+
+
+
+	Example: let's return a table that shows the average pay,first_name, last_name and the hourly_pay
+	
+		 SELECT first_name, last_name, hourly_pay, (SELECT AVG(hourly_pay) FROM employees) AS avrg_pay FROM employees;
+						+------------+-------------+------------+-----------+
+						| first_name | last_name   | hourly_pay | avrg_pay  |
+						+------------+-------------+------------+-----------+
+						| Eugene     | Krabs       |      26.85 | 37.040000 |
+						| Squidward  | Tentacles   |      31.89 | 37.040000 |
+						| Spogebob   | Squarepants |      59.87 | 37.040000 |
+						| Patrick    | Star        |      32.09 | 37.040000 |
+						| Sheldon    | Plankton    |      34.50 | 37.040000 |
+						+------------+-------------+------------+-----------+
+						
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--Logical Operators--
+
+---------------------
+
+------------------------------------------------------------WildCard Characters--------------------------------------------------
+
+table used for examples:
+								  employees:
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			| employee_id | first_name | last_name   | email                      | hourly_pay | hire_date  |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			|           1 | Eugene     | Krabs       | spogebopfriend@gmail.com   |      26.85 | 2021-01-03 |
+			|           2 | Squidward  | Tentacles   | spongebobfirend2@gmail.com |      31.89 | 2020-03-09 |
+			|           3 | Spogebob   | Squarepants | spongebobhimself@gmail.com |      59.87 | 2019-01-15 |
+			|           4 | Patrick    | Star        | spongebobfriend3@gmail.com |      32.09 | 2023-09-12 |
+			|           5 | Sheldon    | Plankton    | spongebobfriend4@gmail.com |      34.50 | 2024-03-23 |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			
+	I.'%'
+	  ->Used to substitute one or more characters in a string
+	  	Example:	   SELECT first_name,last_name FROM employees WHERE first_name LIKE 's%';
+							+------------+-------------+
+							| first_name | last_name   |
+							+------------+-------------+
+							| Squidward  | Tentacles   |
+							| Spogebob   | Squarepants |
+							| Sheldon    | Plankton    |
+							+------------+-------------+
+	II.'_'
+	  ->Used to substitute one or more characters in a string
+	  	Example:
+	  			  SELECT first_name, last_name, email FROM employees WHERE hire_date LIKE '____-01-__';
+						+------------+-------------+----------------------------+
+						| first_name | last_name   | email                      |
+						+------------+-------------+----------------------------+
+						| Eugene     | Krabs       | spogebopfriend@gmail.com   |
+						| Spogebob   | Squarepants | spongebobhimself@gmail.com |
+						+------------+-------------+----------------------------+
+					->shows the employees hired in January of any year and day
+					
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------DATETIME--------------------------------------------
+ ->it's a data type in SQL used to store date and time values in this format: YYYY-MM-DD HH:MM:SS
+    Example: '2025-03-12 14:46:53'
+ --------------------Properties---------------------
+ 	->stores date and time values
+ 	->uses 8 bits of storage
+ 	->does not auto_update unless explicit set
+ ---------------------------------------------------
+ 
+ -----------------------------------------------------------------------------------------------
+REFERENCES = it is used to establish a connection between the foreign key of a table to a primary key of a different table
+									cutomers_id is a column a table named transactions
+	Example: FOREIGN KEY(customers_id) REFERENCES customers(id);	customers is a different table;
+									id is the column set as a pirmary key in the customers table
+FOREIGN KEY = it is the primary key of another table, set up to establish a connection between them.
+PRIMARY KEY =  a column of a table that is unique and not null.It is used to differentiate tables and to join the data between them.
+
+---VIEWS---
+
+ -> virutal table based on the result of a set of SQL statements
+ -> the fields in a view are fields form one or more real tables
+ -> they are not real tables , but can be interacted with as if they were
+ 
+ table used for example:
+ 
+
+---
+----------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------Commands/Clauses---------------------------------------------------------------------------
+show databases; -shows all databases
+create database name; -creates a database
+use name_of_database; -enter into a database
+create table name_of_table(name type of variable, name type of variable,.....);			
+   Example: create table Certificate( id int, name varchar(255));  // varchar is a vector of char	
+show tables; - to see the tables in a database
+describe name_of_table; -shows the insides of the table, NOT THE DATA
+insert into name_of_table(choose in which field) values( different values that match the type set before with the command create table name_of_table) 	 	
+   Example: insert into Certificate values( 1234, "Stefan Marius");
+select * from name_of_table;	-selects all the data from name_of_table
+select name_of_field from name_of_table;	-selects the data from the_name_of_field;		
+   Example: select id from Certificate;	DB: id:1234
+
+delete from name_of_table where ...; - deletes the date where conditions are met;
+alter table name_of_table drop column name_of_column;
+update name_of_table set ... where conditions;
+alter table table_name modify column_name data_type;  -changes the datatype of a column
+
+------------------------------------------------------------------GROUP BY------------------------------------------------------------------------
+
+ ->gropus by all rows by a specific column
+ ->often used with aggregate functions like: AVG(),MAX(),MIN(),COUNT(),etc.
+ ->WHERE clause dosen't work with GROUP BY, use HAVING
+ 
+ table used for examples:
+ 								 transactions
+						+------+--------+-------------+------------+
+						| id   | amount | customer_id | date       |
+						+------+--------+-------------+------------+
+						| 1000 |  13.45 |           1 | 2023-01-12 |
+						| 1001 |  21.43 |           2 | 2023-01-12 |
+						| 1002 |  23.87 |           1 | 2023-01-12 |
+						| 1003 |  12.97 |           3 | 2023-02-12 |
+						| 1004 |   1.00 |           2 | 2023-02-12 |
+						+------+--------+-------------+------------+
+
+	Examples:
+							    SELECT MAX(amount),date
+							    -> FROM transactions
+							    -> GROUP BY date;
+							+-------------+------------+
+							| MAX(amount) | date       |
+							+-------------+------------+
+							|       23.87 | 2023-01-12 |
+							|       12.97 | 2023-02-12 |
+							+-------------+------------+
+		
+
+
+			   SELECT COUNT(amount),customer_id FROM transactions GROUP BY customer_id HAVING COUNT(amount) > 1;
+							+---------------+-------------+
+							| COUNT(amount) | customer_id |
+							+---------------+-------------+
+							|             2 |           1 |
+							|             2 |           2 |
+							+---------------+-------------+
+ --ROLLUP--
+  ->the sum of the GROUP BY clause
+  	Example: 		SELECT COUNT(amount),date FROM transactions GROUP BY date WITH ROLLUP;
+							+---------------+------------+
+							| COUNT(amount) | date       |
+							+---------------+------------+
+							|             3 | 2023-01-12 |
+							|             2 | 2023-02-12 |
+							|             5 | NULL       |
+							+---------------+------------+
+		     SELECT COUNT(amount),customer_id  FROM transactions GROUP BY customer_id WITH ROLLUP HAVING COUNT(amount) > 1;
+							+---------------+-------------+
+							| COUNT(amount) | customer_id |
+							+---------------+-------------+
+							|             2 |           1 |
+							|             2 |           2 |
+							|             5 |        NULL |
+							+---------------+-------------+
+ 
+------------------------------------------------------------------------------------------------------------------------------------------
+ 
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------ORDER BY------------------------------------------------------------
+
+table used for examples:
+								  employees:
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			| employee_id | first_name | last_name   | email                      | hourly_pay | hire_date  |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			|           1 | Eugene     | Krabs       | spogebopfriend@gmail.com   |      26.85 | 2021-01-03 |
+			|           2 | Squidward  | Tentacles   | spongebobfirend2@gmail.com |      31.89 | 2020-03-09 |
+			|           3 | Spogebob   | Squarepants | spongebobhimself@gmail.com |      59.87 | 2019-01-15 |
+			|           4 | Patrick    | Star        | spongebobfriend3@gmail.com |      32.09 | 2023-09-12 |
+			|           5 | Sheldon    | Plankton    | spongebobfriend4@gmail.com |      34.50 | 2024-03-23 |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+ ->orders by DESC(descending) order or ASC(ascending)
+ ->if not specified it will order by ASC order
+ ->u can order by more than one column
+ 	Example: 		SELECT * FROM employees
+    				-> ORDER BY last_name DESC;
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			| employee_id | first_name | last_name   | email                      | hourly_pay | hire_date  |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+			|           2 | Squidward  | Tentacles   | spongebobfirend2@gmail.com |      31.89 | 2020-03-09 |
+			|           4 | Patrick    | Star        | spongebobfriend3@gmail.com |      32.09 | 2023-09-12 |
+			|           3 | Spogebob   | Squarepants | spongebobhimself@gmail.com |      59.87 | 2019-01-15 |
+			|           5 | Sheldon    | Plankton    | spongebobfriend4@gmail.com |      34.50 | 2024-03-23 |
+			|           1 | Eugene     | Krabs       | spogebopfriend@gmail.com   |      26.85 | 2021-01-03 |
+			+-------------+------------+-------------+----------------------------+------------+------------+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+---UPDATE---
+ ->updates data from a table
+ 	1.Fill in missing data or modifying it
+ 	
+ 		Example: Let's say we forgot to add some data to a table.We can add it later with the update comand:
+ 		
+ 			UPDATE employees 
+ 			SET email = 'spongebobfriend4@gmail.com', hourly_pay = 34.5, hire_date = '2024-03-23' 	
+ 			WHERE id = 5;
+ 			
+ 		This updates the data in the respictve fields(email,hourly_pay,hire_date) to the employee that has the id = 5.
+ 		This method can be used even when we want to modify already existing data.
+ 			
+
+----ALTER-----
+ ->adding a column to an existing table
+	---Alter Table Name_Of_Table Add Column Name_Of_Column Data_Type [Constraints];		
+  	  Example:	alter table Certificate add column grade int last; -adds the column grade last
+  	  Example: 	alter table Certificate add column seat int after name; -adds the column seat after the column name
+  	  
+--MODIFY--
+ ->modifies data
+ 	I.Columns
+ 		1.Change the type of data (ALTER TABLE table_name MODIFY column_name type_of_data;)
+ 			Example: ALTER TABLE employees MODIFY email VARHCAR(50);     <- changes the email column to data type varchar(50)
+ 		2.Change the position of a cloumn (ALTER TABLE table_name MODIFY column_name data_type position)
+ 			Example 1: ALTER TABLE employees MODIFY email VARHCAR(50) FIRST;	<- moves the email coulmn first
+ 			Example 2: ALTER TABLE employees MODIFY email VARCHAR(50) AFTER first_name   <- moves the email column after the column first_name
+ 	
+---------------------------------------------------------------------------------------------------------------------------------------
+--------------RENAME TABLE--------------------
+ ->it can rename one ore multiple tables
+ 	RENAME TABLE
+ 	old_name1 TO new_name1,
+ 	old_name2 TO new_name2;
+ 	
+ ->it can rename tables across a database(moves a table from a database to antoher)
+ 	RENAME TABLE old_db.my_table TO new_db.my_table;
+ 
+-----------------------------------------------
+
+--------------------------------------------------------UNION-----------------------------------------------------
+ ->combines the result of two or more SELECT statements but it needs the same amount of columns to do so
+tables used for examples:
+ 					   customers
+			+----+------------+-----------+---------------+
+			| id | first_name | last_name | full_name     |
+			+----+------------+-----------+---------------+
+			|  1 | Radu       | Poienaru  | Radu Poienaru |
+			|  2 | Levi       | Ackerman  | Levi Ackerman |
+			|  3 | Eren       | Jager     | Eren Jager    |
+			|  4 | Levi       | Nicolae   | Levi Nicolae  |
+			+----+------------+-----------+---------------+
+			
+					  transactions
+				+------+--------+-------------+
+				| id   | amount | customer_id |
+				+------+--------+-------------+
+				| 1000 |  13.45 |           1 |
+				| 1001 |  21.43 |           2 |
+				| 1002 |  23.87 |           1 |
+				| 1003 |  12.97 |           3 |
+				| 1004 |   1.00 |           2 |
+				+------+--------+-------------+
+				
+	Example: SELECT first_name,last_name,id FROM customers UNION SELECT * FROM transactions;
+				+------------+-----------+------+
+				| first_name | last_name | id   |
+				+------------+-----------+------+
+				| Radu       | Poienaru  |    1 |
+				| Levi       | Ackerman  |    2 |
+				| Eren       | Jager     |    3 |
+				| Levi       | Nicolae   |    4 |
+				| 1000       | 13.45     |    1 |
+				| 1001       | 21.43     |    2 |
+				| 1002       | 23.87     |    1 |
+				| 1003       | 12.97     |    3 |
+				| 1004       | 1.00      |    2 |
+				+------------+-----------+------+
+->UNION ALL unites all data even if it repeats;		
+ 
+---------------------------------------------------------------------------------------------------------------
+
+--------------------------------------LIMIT---------------------------------------
+ ->limits the number of records making it usefull when working with a lot of data 
+ ->enables pagination(displying large amounts of data on pages)
+ 
+table used for examples:		   customers
+			+----+------------+-----------+---------------+
+			| id | first_name | last_name | full_name     |
+			+----+------------+-----------+---------------+
+			|  1 | Radu       | Poienaru  | Radu Poienaru |
+			|  2 | Levi       | Ackerman  | Levi Ackerman |
+			|  3 | Eren       | Jager     | Eren Jager    |
+			|  4 | Levi       | Nicolae   | Levi Nicolae  |
+			+----+------------+-----------+---------------+
+			
+ 	Examples:	SELECT * FROM customers
+    			-> LIMIT 1;
+			+----+------------+-----------+---------------+
+			| id | first_name | last_name | full_name     |
+			+----+------------+-----------+---------------+
+			|  1 | Radu       | Poienaru  | Radu Poienaru |
+			+----+------------+-----------+---------------+
+			
+			SELECT * FROM customers ORDER BY last_name LIMIT 2;
+			+----+------------+-----------+---------------+
+			| id | first_name | last_name | full_name     |
+			+----+------------+-----------+---------------+
+			|  2 | Levi       | Ackerman  | Levi Ackerman |
+			|  3 | Eren       | Jager     | Eren Jager    |
+			+----+------------+-----------+---------------+
+	
+ ->enables off-sets(LIMIT X,Y).Limit Y after X
+ 
+ 	Example:	SELECT * FROM customers LIMIT 2,2;
+			+----+------------+-----------+--------------+
+			| id | first_name | last_name | full_name    |
+			+----+------------+-----------+--------------+
+			|  3 | Eren       | Jager     | Eren Jager   |
+			|  4 | Levi       | Nicolae   | Levi Nicolae |
+			+----+------------+-----------+--------------+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------JOIN------------------------------------------------------------------------
+
+databases used for examples:
+
+Users:
++----+-------------------+-------------------+---------+
+| id | email             | bio               | country |
++----+-------------------+-------------------+---------+
+|  1 | hello@world.com   | I love strangers! | USA     |
+|  2 | hellos@world.com  | foo               | USA     |
+|  3 | hola@world.com    | bar               | MX      |
+|  4 | bonjour@monde.com | baz               | FR      |
++----+-------------------+-------------------+---------+
+
+Rooms:				
++----+--------------------+----------+
+| id | street             | owner_id |
++----+--------------------+----------+
+|  1 | san diego sailboat |        1 |
+|  2 | nantucket cottage  |        2 |
+|  3 | vail cabin         |        1 |
+|  4 |  sf carboard box   |        3 |
++----+--------------------+----------+
+
+ ->reading data from 2 diffrent tables
+	LEFT JOIN  -> shows all data from the first table even if there is no relation between them
+	
+	   Example: 	SELECT * FROM Users LEFT JOIN Rooms ON Rooms.owner_id = Users.id;
+			+----+-------------------+-------------------+---------+------+--------------------+----------+
+			| id | email             | bio               | country | id   | street             | owner_id |
+			+----+-------------------+-------------------+---------+------+--------------------+----------+
+			|  1 | hello@world.com   | I love strangers! | USA     |    1 | san diego sailboat |        1 |
+			|  1 | hello@world.com   | I love strangers! | USA     |    2 | nantucket cottage  |        1 |
+			|  1 | hello@world.com   | I love strangers! | USA     |    3 | vail cabin         |        1 |
+			|  1 | hello@world.com   | I love strangers! | USA     |    4 |  sf carboard box   |        1 |
+			|  2 | hellos@world.com  | foo               | USA     | NULL | NULL               |     NULL |
+			|  3 | hola@world.com    | bar               | MX      | NULL | NULL               |     NULL |
+			|  4 | bonjour@monde.com | baz               | FR      | NULL | NULL               |     NULL |
+			+----+-------------------+-------------------+---------+------+--------------------+----------+
+	   				      ->shows all the users even if they didn't book a room;
+	   
+	RIGHT JOIN ->shows all the data from the second table even if there is no relation between them
+	
+	   Example:	SELECT * FROM Users
+    			-> RIGHT JOIN Rooms
+    			-> ON Rooms.owner_id = Users.id;
+		+------+-----------------+-------------------+---------+----+--------------------+----------+
+		| id   | email           | bio               | country | id | street             | owner_id |
+		+------+-----------------+-------------------+---------+----+--------------------+----------+
+		|    1 | hello@world.com | I love strangers! | USA     |  1 | san diego sailboat |        1 |
+		|    1 | hello@world.com | I love strangers! | USA     |  2 | nantucket cottage  |        1 |
+		|    1 | hello@world.com | I love strangers! | USA     |  3 | vail cabin         |        1 |
+		|    1 | hello@world.com | I love strangers! | USA     |  4 |  sf carboard box   |        1 |
+		+------+-----------------+-------------------+---------+----+--------------------+----------+
+	   				->shows all the rooms even if they are not booked
+	   	
+	INNER JOIN  -> shows the intersection of data from the 2 tables;
+	
+	   Example: 	SELECT * FROM Users
+    			-> INNER JOIN Rooms
+    			-> ON Rooms.owner_id = Users.id;
+			+----+------------------+-------------------+---------+----+--------------------+----------+
+			| id | email            | bio               | country | id | street             | owner_id |
+			+----+------------------+-------------------+---------+----+--------------------+----------+
+			|  1 | hello@world.com  | I love strangers! | USA     |  1 | san diego sailboat |        1 |
+			|  2 | hellos@world.com | foo               | USA     |  2 | nantucket cottage  |        2 |
+			|  1 | hello@world.com  | I love strangers! | USA     |  3 | vail cabin         |        1 |
+			|  3 | hola@world.com   | bar               | MX      |  4 | sf carboard box    |        3 |
+			+----+------------------+-------------------+---------+----+--------------------+----------+
+	   			->shows the corresponding owner of the room or rooms if the owner booked more;
+	   	    
+	OUTTER JOIN
+		-> isn't supported in mySQL; 
+		
+	SELF JOIN -> a concept of joing the same table instead of two or more tables;
+	
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--------------------------------------------------FUNCTIONS-------------------------------------------------
+
+--COUNT--
+ -> SELECT COUNT(column) FROM table_name
+ 	->counts the rows of that specific column
+---
+
+--MAX--
+ ->returs the maximum value of a column
+ 	Example: SELECT MAX (amount) FROM transactions
+ 		->returns the max value from the amount column;
+----
+
+--MIN---
+ ->returns the minimum value of a column
+ 	Example: SELECT MIN (amount) FROM transactions
+ 		->returns te min value from the amonut column;
+---
+
+--AVG--
+ ->returns the average value of a column
+ 	Example: SELECT AVG (amount) FROM transactions
+ 		->returns te average value from the amonut column;
+----
+
+--SUM--
+ ->returns the sum of a cloumn
+ 	Example: SELECT SUM(amount) FROM transactions;
+ 		->returns the sum of amount column
+----
+
+--CONCAT--
+ ->concatanets columns
+ 	Example: SELECT CONCAT(first_name,' ',last_name) AS full_name FROM Users;
+ 	
+ 	Example: ALTER TABLE Users
+ 		 ADD COLUMN full_name VARCHAR(100);
+ 		 UPDATE Users 
+ 		 SET full_name = CONCAT(first_name,' ', last_name);
+ 		 
+ 
+ 	
+
+----
+------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------Inserting Values Into A Table--------------------------------------------------------------
+	INSERT INTO table_name(speicify what fields u want to insert into) VALUES (values that match the type of data created);
+		Example: INSERT INTO transactions (amount, customer_id)
+			VALUES
+			(12.32, 1),
+			(123.43, 1),
+			(23.43, 4),
+			(12.43, 2);
+			
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------Rebuilding A Table--------------------------------------------------------------
+ I. Create a new table with the same struture as another one---
+	CREATE TABLE new_table LIKE old_table;
+		-> the command creates the new_table that has the exaxct same columns, indexes and structure as the old_table;
+		-> this command only copies the structure, not the actual data;
+ II. Copy the data to the new table (with the same constraints)
+ 	INSERT INTO new_table(fields from the old table) SELECT fields from the old table FROM old_table [constraints];
+ 		-> 
+ III. Remove the old_table
+ 	DROP TABLE old_table;
+ IV. Rename the new table
+ 	RENAME TABLE new_table TO old_table;
+ 	
+  Example:  	CREATE TABLE Users_new LIKE Users;
+  		INSERT INTO Users_new (email, bio, country) SELECT email, bio, country FROM Users ORDER BY id;
+  		DROP TABLE Users;
+  		RENAME TABLE Users_new to Users;
+------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------Renaming a Database with Logical Import and Export of a Database-------------------------------------
+ I.Exporting the database to an .sql file
+ 	bash: sudo mariadb-dump old_database > old_database.sql
+ II.Creating a new database
+ 	sql: CREATE DATABASE new_database;
+ III.Copying the contents of the old_databe to the new_databse
+ 	bash: sudo mariadb new_database < old_databse.sql
+ IV.Deleting the old databse
+ 	sql: DROP DATABASE old_database;
+------------------------------------------------------------------------------------------------------------------------------------------
+
+-----Filling in data in a column without affecting the others-----
+
+table used:
++----+-------------------+-------------------+---------+------+
+| id | email             | bio               | country | name |
++----+-------------------+-------------------+---------+------+
+|  1 | hello@world.com   | I love strangers! | USA     | NULL |
+|  2 | hellos@world.com  | foo               | USA     | NULL |
+|  3 | hola@world.com    | bar               | MX      | NULL |
+|  4 | bonjour@monde.com | baz               | FR      | NULL |
++----+-------------------+-------------------+---------+------+
+
+Syntax:
+		UPDATE Users
+		  SET name = CASE id
+	    		WHEN 1 THEN 'John'
+	    		WHEN 2 THEN 'Alice'
+	    		WHEN 3 THEN 'Carlos'
+	    		WHEN 4 THEN 'Marie'
+	  	  END
+		WHERE id IN (1, 2, 3, 4);
+		
+
+After instructions:
++----+-------------------+-------------------+---------+--------+
+| id | email             | bio               | country | name   |
++----+-------------------+-------------------+---------+--------+
+|  1 | hello@world.com   | I love strangers! | USA     | John   |
+|  2 | hellos@world.com  | foo               | USA     | Alice  |
+|  3 | hola@world.com    | bar               | MX      | Carlos |
+|  4 | bonjour@monde.com | baz               | FR      | Marie  |
++----+-------------------+-------------------+---------+--------+
+
+------------------------------------------------------------------
+
+
+----Creating Users----
+
+ must be root
+
+CREATE USER 'your_new_user'@'localhost' IDENTIFIED BY 'your_strong_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON your_database_name.* TO 'your_new_user'@'localhost';
+FLUSH PRIVILEGES;
+------------------------------------------------------------------------------------------------
+
+
+---Changing Passwords---
+
+must be root
+
+USE mysql;
+ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('your_new_password');
+FLUSH PRIVILEGES;
+EXIT;
+-------------------------------------------------------------------------------------------------------	
