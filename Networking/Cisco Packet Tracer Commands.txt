@@ -5,6 +5,11 @@
  -># enable secret password_name   //sets up an encrypted password(it doesn't show what u type) || enable password password_name(it shows what password you type) not encypted
  -># no ip domain-lookup
 
+//if u set a password and forget to encrypt it
+ -> enable password Glontic
+ -> service password-encryption
+
+
 ----no ip domain-lookup---
  -> by default cisco devices have  ip domain-lookup enabled => when it doesn't recognize a command or a name it assumes it's a hostname and it tries to connect to it
  -> by enabling no ip domain-lookup it allows cisco devices to stop searching for a hostname that doesn't exist(it's a quality of life command to correct typos or invalid commands)

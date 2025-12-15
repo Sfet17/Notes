@@ -1,11 +1,29 @@
 ======OSI Model======
  -> 7.Application
+	-> User Interface: represents the interface between the user and the service(the network)
+	-> User Interface: provides network services directly to end-user applications => communicate over a network
+	-> Data Representation: ensures that the data is in a format both the receiver and the sender can understand
+	-> Protocol Management: HTTP, HTTPs, FTP, DNS.
  -> 6.Presentation
+	-> Data Translation: Converts data between different formats (ASCII)
+	-> Data Compression: Compresses data in order to reduce size and speed efficiency
+	-> Encryption: Encrypts data before transmission to secure it from unauthorized access.
+	-> Decryption: Decrypts incoming data to make it readable for the application layer
+	-> Protocol Management: JPEG, PNG, GIF.
  -> 5.Session
+	-> it manages, secures and terminates the session between the source application and the destination
+	-> it ensures the data transmitted in he session in reliable
+	-> it reestablishes it if the session is interrupted
  -> 4.Transport
+	-> it manages segmentation of data into smaller packets and directs them to the appropriate application process using port numbers
+	-> establishes end to end communication between devices
+	-> ensures flow control and error handling
  -> 3.Network
+	->
  -> 2.Data Link
+	->
  -> 1.Physical Access
+	->
 =====================
 
 ======TCP/IP Model======
@@ -17,7 +35,7 @@
 
 ======ARP(Address Resolution Protocol)======
  -> the Address Resolution Protocol (ARP) is a communication protocol for discovering the link layer address, such as a MAC address, associated with an internet layer address, typically an IPv4 address.
- -> it's LOCAL, if it want to find a device from a different network, it will asign the ip addres and the mac address of the router embedded in the local network.(it maps the default gateway)
+ -> it's LOCAL, if it want to find a device from a different network, it will assign the ip address and the mac address of the router embedded in the local network.(it maps the default gateway)
 
 ======ARP Table======
  -> contains combinations between IP addresses and MAC addresses
@@ -37,15 +55,6 @@
 
 ===========================================
 
-
-=======TCP(Transmission Control Protocol)=======
-
- -> fundamental networking protocol that ensures reliable transmission of data between devices or applications on a network
- -> establishes a connection, breaks data into packets and makes sure the data is sent in the correct order, 
-		without errors by using retransmission requests(resends the package if it doesn't receive a confirmation from the receiver in a specific time ) and error correction
- -> works with the IP(Internet Protocol) being essential for web apps, emails and file transfers on a network
- -> it is part of the transport layer
-
 ======ICMP(Internet Control Message Protocol)======
 
 ===================================================
@@ -57,11 +66,58 @@
 
 
 ======MAC Address======
- -> it's a unique identifie given to a device that it's used by switches, in a local network, to find where a device is(logically). 
+ -> it's a unique identifier given to a device that it's used by switches, in a local network, to find where a device is(logically). 
  -> format: six groups of 2 hexadecimal numbers
- 	->Ex: FF.FF.FF.FF.FF.FF  <- this is actually the boradcast MAC address  
+ 	->Ex: FF.FF.FF.FF.FF.FF  <- this is actually the broadcast MAC address  
 =======================
 
 ======IPv4 Address======
  ->
+========================
+
+
+===========TCP(Transmission Control Protocol)===========
+
+ -> it's a protocol used at the transport level, used for transmitting data between devices
+ -> establishes a connection, breaks data into packets and ensures that these packets are delivered
+ -> it uses a three way handshake to establish a connection for the transfer
+ 	Three Way Handshake
+		-> the sender sends and SYN packet to the receiver
+		-> the receiver responds with an SYN-ACK packet to acknowledge
+		-> the sender sends back ACK packet to establish the connection
+			SYN(Synchronize Sequence Number) packet
+			 -> tells the receiver that the sender is likely to segments with
+			 -> tells the number the sender will start the communication with 
+			SYN-ACK packet
+			 -> ACK(Acknowledgement) it tells the sender that response message is received 
+			 -> SYN it established the Sequence Number that's likely to start the segments with
+			ACK(Acknowledge) packet
+			 -> the sender acknowledges the response from the receiver and they establish a secure connection to communicate  
+ ---Key Features---
+  -> Connection Oriented
+	-> establishes a connection via three way handshake
+  -> Error Checking
+	-> if a packet is corrupted or wasn't transmitted TCP will send that packet again
+  -> Flow Control
+	-> manages the rate of the data being sent to not be overwhelming to the receiver
+  -> Reliable Delivery
+	-> ensures the data is being sent accurately and in the correct order
+
+!Best used for reliable data transfer when integrity is top priority!
+Examples that use TCP: Email(SMTP, IAMP), Web Transfer(HTTP, HTTPs), File Transfer(FTP)
+
+========================================================
+
+
+======UDP(User Datagram Protocol)======
+
+ -> it's a transfer layer protocol, used for fast data delivery without guarantying delivery, the order or the amount of data being sent
+ -> it's connectionless, it doesn't establish a connection between devices before starting to share data, making it faster than TCP
+
+!Best used for fast data transfer, when speed is more important than integrity!
+Examples that use UDP: VoIP(VoiceOverIP), Online gaming, Voice Chat, Streaming Services
+=======================================
+
+======Multiplexing======
+ ->a method where multiple digital or analog signals are combined into one over a share medium
 ========================
