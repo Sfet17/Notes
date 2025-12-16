@@ -8,4 +8,84 @@ then DashboardTabDto has a List of WidgetDto so i need to map Widget to WidgetDt
 
 I also need to configure the AutoMapper in Startup.cs for the program to know where to get the MappingConfiguration
  services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+
+IdentiyServer Open Redirect Vulnrability
+ -> Some functions in idenityServer will consider a malicous URL as a local one (and trusted), if such URL will be returned as a redirect
+									   browsers will follow it to a third party, unstrusted site.
+ ->
+
+EF Core - Error "The association between entities has been severed" while deleting child entity from parent
+ Ex: dashboard =  await GetUserDashboard()
+	...
+     dashboard.Tabs.Remove(tabToRemove);  
+
+ -> tabToRemove is a DashboardTab type , a child to dashboard that is a Dashboard type, the parent,
+ the command only cuts the connection between them (like cutting the rope, making the child an orphan but the child stil exists)
+ basiclly I am telling Ef Core that this tab no longer belongs here, it tries to net the DashboardId to null, but then the database says that is not possible(since it's a primary key)
+
+The solution
+ KILL THA CHILDD
+  ->remove it straight from the database don't sever the connection
+	context.Tabs.Remove(tabToRemove); 
 	
+
+UP
+-> what happenes when u add the migration
+
+DOWN
+-> what happens if u want to remove the migration
+
+===============================================================================================================
+"Evil Twin" Error
+==================
+
+public async Task<DashboardTab> RemoveUserDashboardTab(DashboardDto dashboard, DashboardTabDto tabToRemove)
+
+        {
+
+            var dashboardTabToRemoveDto = mapper.Map<DashboardTab>(tabToRemove);
+
+            context.DashboardTabs.Remove(dashboardTabToRemoveDto);
+
+            //await dashboard.Tabs.Remove(tabToRemove);
+
+            await context.SaveChangesAsync(); 
+
+            return dashboardTabToRemoveDto;
+
+        }
+
+ DbContext has a Change Tracker(like a memory cahce)
+ 	-> it only allows to track a table based on ONE object instance representing a row(like the PrimaryKey)
+	-> it sets a value to that object instance when i get the Dashboard in this case
+	
+				[Change Tracker Memory]
+	Row ID 4  ===>  [Object A (Memory Address: 0x100)]  <--- The "Real" Entity
+
+
+ mapper.Map<DashboardTab>(tabToRemove)
+	-> it creates a new object in memory, copying the data from tabToRemove, creating an object instance
+
+				[Your Local Variable]
+	Row ID 4  ===>  [Object B (Memory Address: 0x999)]  <--- The "Imposter" (Evil Twin)
+
+ context.DashboardTabs.Remove(dashboardTabToRemoveDto);
+	-> this line doesn't know who is the right object instance to remove since they both track the same value(in this case 4), that's where the error occurs
+	
+Fix:
+ Verify if the instance is already tracked, if it's not, then it can be mapped.
+
+
+===============================================================================================================
+===============================================================================================================
+"Unable to resolve service for type 'Revolution.Api.Managers.Widgets.IWidgetsManager' while attempting to activate 'Revolution.Api.Controllers.Dashboard.WidgetsController'.
+
+This happends when the service(program) doesn't realize where to get the resources from. I want to get a tool that i forgot to put in the toolbox.
+Dependecy injection Framework needs, in order to resolve IRepository, to be registered with a container.
+
+Fix:
+put the tool in the toolbox(Startup.cs):
+	services.AddTransient<IRepository, MemoryRepository>();
+
+===============================================================================================================

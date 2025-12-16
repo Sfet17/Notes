@@ -1,3 +1,18 @@
+=============================================================================================================================
+Notes from a REST APIs Tutorial
+-------------------------------
+
+------------------------
+Connection to a Database 
+------------------------
+
+------------------------
+Creating the Context 
+------------------------
+
+
+
+
 =============================================================================================================================            
 var grantPermissions = dto.Select(x => entityPermissionManager.GrantStudioPermissionAsync(
                 x.Permission,
@@ -542,6 +557,49 @@ public async Task RemoveCasinoPermissionsBulk(CasinoPermissionsBulkDto dto, int 
      return tabToEdit;
  }
 =============================================================================================================================
+
+
+=========================================================================================================================
+ public async Task<WidgetDto> CreateWidgetInUserDashboardTab(WidgetCreateDto createWidget, int dashboardTabId)
+ {
+     var dashboardTab = await dashboardRepository.GetDashboardTabById(dashboardTabId);
+     ////use automapper
+     //var newWidget = new Widget
+     //{
+     //    Name = createWidget.Name,
+     //    Column = createWidget.Column,
+     //    Height = createWidget.Height,
+     //    Row = createWidget.Row,
+     //    Width = createWidget.Width,
+     //    GroupBy = Enum.TryParse<WidgetGrouping>(createWidget.GroupBy, out var groupByValue) ? groupByValue : default,
+     //    Metric = Enum.TryParse<WidgetMetric>(createWidget.Metric, out var metricByValue) ? metricByValue : default,
+     //    Type = Enum.TryParse<WidgetType>(createWidget.Type, out var typeByValue) ? typeByValue : default,
+     //    MainDateRange = mapper.Map<WidgetTimePeriod>(createWidget.MainDateRange), 
+     //    DashboardTabId = dashboardTabId, 
+     //};
+     var newWidget = mapper.Map<Widget>(createWidget);
+     dashboardTab.Widgets.Add(newWidget);
+     await context.SaveChangesAsync();
+     var widgetDto = mapper.Map<WidgetDto>(newWidget);
+     return widgetDto;
+     //dashboardTab.Widgets.Add(newWidget);
+     //await context.SaveChangesAsync();
+     //var widgetDto = mapper.Map<WidgetDto>(newWidget);
+     //return widgetDto;
+ }
+
+
+To Setup AutoMapper in The MappingProfile i need to add a few lines to handle the exceptions:
+
+ CreateMap<WidgetTimePeriod, WidgetTimePeriodDto>
+ CreateMap<Widget, WidgetCreateDto>().ReverseMap();
+	.ReverseMap()
+	.ForMember(dest => dest.GroupBy, opt => opt.MapFrom(source => Enum.Parse(source.GroupBy)))
+	.ForMember(dest => dest.GroupBy, opt => opt.Metric(source => Enum.Parse(source.Metric)))
+	.ForMember(dest => dest.Type, opt => opt.MapFrom(source => Enum.Parse<WidgetType>(source.Type)));
+
+
+=========================================================================================================================
 
 
 
