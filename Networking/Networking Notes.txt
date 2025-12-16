@@ -6,13 +6,13 @@
 	-> Protocol Management: HTTP, HTTPs, FTP, DNS.
  -> 6.Presentation
 	-> Data Translation: Converts data between different formats (ASCII)
-	-> Data Compression: Compresses data in order to reduce size and speed efficiency
+	-> Data Compression: Compresses data in order to reduce size and speed efficiency.
 	-> Encryption: Encrypts data before transmission to secure it from unauthorized access.
 	-> Decryption: Decrypts incoming data to make it readable for the application layer
 	-> Protocol Management: JPEG, PNG, GIF.
  -> 5.Session
 	-> it manages, secures and terminates the session between the source application and the destination
-	-> it ensures the data transmitted in he session in reliable
+	-> it ensures the data transmitted in the session in reliable
 	-> it reestablishes it if the session is interrupted
  -> 4.Transport
 	-> it manages segmentation of data into smaller packets and directs them to the appropriate application process using port numbers
@@ -35,7 +35,7 @@
 
 ======ARP(Address Resolution Protocol)======
  -> the Address Resolution Protocol (ARP) is a communication protocol for discovering the link layer address, such as a MAC address, associated with an internet layer address, typically an IPv4 address.
- -> it's LOCAL, if it want to find a device from a different network, it will assign the ip address and the mac address of the router embedded in the local network.(it maps the default gateway)
+ -> it's LOCAL, if it want to find a device from a different network, it will assign the Ip address and the mac address of the router embedded in the local network.(it maps the default gateway)
 
 ======ARP Table======
  -> contains combinations between IP addresses and MAC addresses
@@ -47,7 +47,7 @@
 ======CAM(Content Addressable Memory)======
  -> Content Addressable Memory which is a special type of memory used by Cisco switches that returns the address where the data is stored.
  -> best for creating tables that search the exact values, such as MAC address tables (CAM Tables)
- -> faster than RAM since the search the enitre memory in one opperation
+ -> faster than RAM since the search the entire memory in one operation
 ======CAM Table======
  -> they can only provide two result true(1) or false (0)
  ->
@@ -60,10 +60,30 @@
 ===================================================
 
 
-======HTTP(HyperText Transfer Protocol)======
- ->
+======HTTP(Hyper Text Transfer Protocol)======
+ -> uses 80 port
 =============================================
 
+======HTTPs(Hyper Text Transfer Protocol Secure)======
+ -> uses port 443
+=====================================================
+
+======FTP(File Transfer Protocol)======
+ -> uses port 20(FTP Data) and 21(FTP Control)
+=======================================
+
+======SSH(Secure Shell)======
+ -> uses port 22
+=============================
+
+======DNS(Domain Name Service)=====
+ -> uses port 53
+===================================
+
+======DHCP(Dynamic Host Configuration Protocol)======
+ -> uses port 67 & 68
+ -> configures an Ip dynamically for a device added to a new network(using a portion of it's own mac address)
+====================================================
 
 ======MAC Address======
  -> it's a unique identifier given to a device that it's used by switches, in a local network, to find where a device is(logically). 
