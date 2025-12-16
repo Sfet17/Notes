@@ -1,5 +1,5 @@
+==============================================================================================
 Enumerable.Where Method
-
 .Where()
  -> filters a sequence based on a predicate(function to verify each element for a condition)
  -> return an IEnumrable that contains the elements that fit that condition
@@ -15,30 +15,95 @@ foreach (string fruit in query)
 {
     Console.WriteLine(fruit);
 }
-/*
- This code produces the following output:
 
- apple
+ This code produces the following output:
+apple
  mango
  grape
-*/
 
+
+==============================================================================================
+
+==============================================================================================
 .RemoveRange(Object)
  -> tracks the given object in order to delete it from the database when SaveChanges() is applied.
  -> removes items by index
  -> retruns a void value
+==============================================================================================
 
+==============================================================================================
 .Remove(Object)
  -> it does the exact same thing
  -> removes an item by value
  -> it returns a bool statement
+==============================================================================================
 
-.ExecuteDelete()
+==============================================================================================
+.ExecuteDelete() // .ExecuteDeleteAsync()
  -> deletes the data from the database directly without traking & selecting it 
+Ex: Delete all files that have an Id < 3
+	await context.Files.Where(x = x.Id < 3).ExecuteDeleteAsync();
+
+.ExecuteUpdate() // ExecuteUpdateAsync();
+ -> executes a proprety based on a condition
+Ex: Put the files with the id less than 3 in the backrooms(make them invisible)
+	await context.Files.Where(x => x.Id < 3).ExecuteUpdateAsync(s => s.SetPropriety(x => x.IsVisible, false))
+==============================================================================================
+
+==============================================================================================
+DbContext.Local
+ -> it is the place where the queries or the modifications to database are stored before taking full effect on the database(server RAM), or after they are recived.
+
+
+[  Your Code  ]
+      |
+      |  (1. Query data)
+      v
+[  DbContext Memory (RAM)  ] <--- THIS IS ".Local"
+|  ----------------------  |      (The Change Tracker's visible list)
+|  [ Entity A (Unchanged) ]|
+|  [ Entity B (Added)     ]|
+|  [ Entity C (Modified)  ]|
+|  ----------------------  |
+      ^
+      |  (2. SaveChanges pushes this data down)
+      |  (3. Queries pull data up into here)
+      v
+[  SQL Database (Disk)]
+   [ Row 1 ]
+   [ Row 2 ]
+   [ Row 3 ]
+
+ -> it's an observable place that is in sync with my acations in real time
+ -> it automatically include the Adds, but if i want to Remove something it dosen't show in .Local anymore event tho it is still being tracked. 
+				     (use SaveChangesAsync() in order to sync it up no matter the operation)
+
+==============================================================================================
+
+
+==============================================================================================
+Enums
+ ->
+==============================================================================================
+
+==============================================================================================
+GroupBy = Enum.TryParse<WidgetGrouping>
+		(createWidget.GroupBy, out var groupByValue) ? groupByValue : default
+
+Enum.TryParse(look more into it and exercise using it)
+ ->this method returns a boolean value (that's why it's used with the teranry operator, if it's true return groupByValue, if it's not return the default value)
+ ->Enum.TryParse<type>
+		(string, out var object) ? return if true : return if false
+
+
+==============================================================================================
+
+==============================================================================================
+TryParse vs Parse
 
 
 
-
+==============================================================================================
 
 
 

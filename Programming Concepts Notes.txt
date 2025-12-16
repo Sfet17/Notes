@@ -1,3 +1,4 @@
+===================================================================================================================
 Eager Loading 
  -> loads all the necessary data, including related data, without waiting for it to be requested
  -> beneficial for performance as it reduces the number of database calls needed
@@ -28,21 +29,46 @@ Ex:
 		it will soon run out of "waiters"(working threads) to take the "orders"(HTTP Requests)
  ->using an async methods solves this problem somewhat, given the fact that when a thread is given a specifc task, it can be used for something else aswell
 		(like waiter who places and order and then goes back to place more orders; the order he places can be given to the customers by him, or other waiters)
+===================================================================================================================
 
+===================================================================================================================
 Sync VS Aysnc
 
 
 
+===================================================================================================================
 
-========================================================================
+===================================================================================================================
 Batch Processing/Bulk Insert 
 ----------------------------
+====================================================================================================================
 
-========================================================================
-
-========================================================================
+====================================================================================================================
 Cache vs Database
 -------------------
  -> i had a bug now where my code was looking in the cache but not in the database so it would add the same thing more times(a permission someone should only have once, it the cache it wasnt but it the database it was and it kept adding it)
  -> very importnat to invalidate the cache so that the databse and the cache are synced up
-========================================================================
+====================================================================================================================
+
+====================================================================================================================
+!!! A DTO is a photocopy of the real data, if u delete a DTO the data that it copies is not deleted !!!
+====================================================================================================================
+
+====================================================================================================================
+Cache Invalidation
+ -> a process of marking or removing stale date from cache so that the system can retrive fresh new data from the source,
+	preventing users and coders to use old information
+ -> imporivng effiency(retriving the data faster from source), but keeping the integrity (making sure the data in cache == source)
+====================================================================================================================
+
+
+====================================================================================================================
+AutoMapper
+
+CreateMap<source, destination>
+ -> it's the simpelest syntax for an automapper configuration
+ -> this basically means that i want to teach how to transform the source into the destanation
+			(if the fields and the names are the same in both places, it will mapp automatically,
+			if they are not the same, some new rules must be set in place)
+ -> to add some rules use the method .ForMember(dest => dest.filed, opt => opt.MapFrom(source => the rule/ conversion of types/ etc))
+====================================================================================================================
