@@ -24,3 +24,13 @@ git add -u
  -> stages all the modified and deleted files in the directory
 
 ==========================================================================================
+ git checkout
+
+  -> switches branches or restores working tree files
+
+	1.Swithces branches
+		git checkout <branch_name>
+	2.Restore a different verison of a file
+		git checkout <commit> <file_name> // git checkout <file_name>
+
+==========================================================================================

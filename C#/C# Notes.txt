@@ -20,8 +20,7 @@ foreach (string fruit in query)
 apple
  mango
  grape
-
-
+ 
 ==============================================================================================
 
 ==============================================================================================
@@ -83,7 +82,22 @@ DbContext.Local
 
 ==============================================================================================
 Enums
- ->
+ -> a special "class" used to store constants
+ -> by default the first item in a enum(enumartion) starts at zero
+ -> can also a differnet index inside of a Enum
+Ex: Enum WorkDays
+{
+ Monday,
+ Tuesday,
+ Wendesday = 12,
+ Thursday,
+ Friday
+}
+Console.Write((int)WorkDays.Wendesday)
+	-> : 12
+Console.Write((int)WorkDays.Thursday)
+	-> : 13
+
 ==============================================================================================
 
 ==============================================================================================
@@ -101,6 +115,14 @@ Enum.TryParse(look more into it and exercise using it)
 ==============================================================================================
 TryParse vs Parse
 
+Parse
+ -> throws an exception if it cannot parse the value
+
+TryParse
+ -> throws a boolen value, that ididicates if it succeded or not
+ -> it's implemented without exceptions so that it's faster
+
+!Use Parse if the convertion is sure to be made, TryParse if not!
 
 
 ==============================================================================================
