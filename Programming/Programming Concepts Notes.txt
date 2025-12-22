@@ -72,3 +72,14 @@ CreateMap<source, destination>
 			if they are not the same, some new rules must be set in place)
  -> to add some rules use the method .ForMember(dest => dest.filed, opt => opt.MapFrom(source => the rule/ conversion of types/ etc))
 ====================================================================================================================
+
+====================================================================================================================
+Removing a bad migration after database update
+
+dotnet ef database update <previous_migration_name> --project<project_name> --context<context_name>
+	-> this will update the database to the second last migration
+dotnet ef migrations remove
+	-> this will delete the last migration
+
+====================================================================================================================
+

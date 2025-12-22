@@ -89,3 +89,14 @@ put the tool in the toolbox(Startup.cs):
 	services.AddTransient<IRepository, MemoryRepository>();
 
 ===============================================================================================================
+
+===============================================================================================================
+"Unhandled exception: Response status code does not indicate success: 401 (Unauthorized)."
+	-> for trying to install a new version of dotnet(or reinstaling it)
+ This happened because there was a source I used(Telerik) that required authentification (being a private feed).
+
+Fix: disabling the source that required some credentials to bepassed through, install the new verion of dotnet(or any other commands this was blocking)
+					then reenable that source again
+							dotnet nuget disable source <source_name>
+							dotnet ---command
+							dotnet nuget enable source <source_name>
