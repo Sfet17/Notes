@@ -601,5 +601,28 @@ To Setup AutoMapper in The MappingProfile i need to add a few lines to handle th
 
 =========================================================================================================================
 
+=========================================================================================================================
+using Revolution.GamingTables.Api.Database;
+using Revolution.LiveTables.Api.Models.Base;
+using Revolution.LiveTables.Model.Domain;
 
+namespace Revolution.LiveTables.Api.Repositories.RoundsRepository
+{
+    public class RoundsRepository(RevolutionGamingTablesContext context) : Repository<Round>(context), IRoundsRepository 
+    {
 
+    }
+
+using Revolution.LiveTables.Api.Models.Base;
+using Revolution.LiveTables.Model.Domain;
+
+namespace Revolution.LiveTables.Api.Repositories.RoundsRepository
+{
+    public interface IRoundsRepository : IRepository<Round>
+    {
+
+    }
+}
+
+Learn what it does
+=====================================================================================================================

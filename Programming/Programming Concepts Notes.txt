@@ -83,3 +83,48 @@ dotnet ef migrations remove
 
 ====================================================================================================================
 
+====================================================================================================================
+Route Notation Warrning
+ -> if i want to add in an API call /start/{id} like so [HttpPut("{/start/{id}}")] 
+				i would expect it to be appended to the rest ouf the route, but it doesn't
+ -> the '/' essentially tells ASP.NET to ignore the route entierly, leaving only whats after the symbol
+ -> the correct route adding for the API would be [HttpPut("start/{id}")] => route/start/id
+				
+====================================================================================================================
+
+====================================================================================================================
+Tuples
+ -> data structure that uses multiple parts
+ -> easiest way to represent data that has multiple values of different types
+ -> we can add items from 1 to 8 max in a touple
+Features 
+ -> represents multiple data into a single data set
+ -> allows for multiple data to be passed out into a method while using a single paramater
+ -> it can store duplicate elements
+ -> it returns multiple values from a method without using the out paramater
+
+There are two ways to create a tuple
+ 1.Using the constructor
+	-> Ex: Tuple<datatype> name = new Tuple<datatype>(Value);
+	       Tuple<datatype, datatype> name = new Tuple<datatype, datatype>(Value, Value);
+ 2.Using the Create method 
+	-> Ex: var name = Tuple.Create(Value);
+	       var name = Tuple.Create(Value, Value);
+
+!We access the elements in a tuple using the the keyword Item(it varies from 1 to 7)!
+!We can also have nested tuples(a tuple inside a tuple)!
+
+Examples: var tuple = Tuple.Create(Value1. Tuple.Create(Value2, Value3));
+	Console.WriteLine(tuple.Item2.Item1)
+			=> Value2;
+ 
+====================================================================================================================
+
+====================================================================================================================
+
+
+====================================================================================================================
+Entity vs Dtos(Repository Files)
+ -> repository files (for example in C#) are made to handle the entity data, the raw model, closest to the datbase
+
+====================================================================================================================

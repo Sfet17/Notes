@@ -45,13 +45,9 @@ public async Task<DashboardTab> RemoveUserDashboardTab(DashboardDto dashboard, D
         {
 
             var dashboardTabToRemoveDto = mapper.Map<DashboardTab>(tabToRemove);
-
             context.DashboardTabs.Remove(dashboardTabToRemoveDto);
-
             //await dashboard.Tabs.Remove(tabToRemove);
-
             await context.SaveChangesAsync(); 
-
             return dashboardTabToRemoveDto;
 
         }
@@ -100,3 +96,16 @@ Fix: disabling the source that required some credentials to bepassed through, in
 							dotnet nuget disable source <source_name>
 							dotnet ---command
 							dotnet nuget enable source <source_name>
+===============================================================================================================
+
+
+===============================================================================================================
+Existing Data vs New Rules
+ -> enstricting strict rules (like adding a foreign key) on data that is either dirty, incomplete or non existing
+ -> it happened after a small restructuring of the database, when a new foreign key (to a table added in the new migration)
+	was added to an already existing table, but it was referencing no data since the new table added in the new migration
+		had no data in it, so it was a foreign key constraint that was referencing to a table that had no data
+
+ Fix: Adding a default value(like 1) in the migration file, to the new table, so that the FK constraint will work
+ Fix: Changing the model of LiveTables(the already existing table) to permit nullable values 
+===============================================================================================================

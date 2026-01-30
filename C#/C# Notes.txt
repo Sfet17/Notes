@@ -127,5 +127,54 @@ TryParse
 
 ==============================================================================================
 
+==============================================================================================
+DateTime
 
+==============================================================================================
+
+==============================================================================================
+Context.Update()
+
+==============================================================================================
+
+
+
+==============================================================================================
+!Transient, Scoped and Singleton are "Lifecycles" of an object!
+	-> it tells the program how long an object should be alive for
+
+.AddTransient()
+  -> creates a copy of the object everytime it is requested
+  -> Pros: thread-safe => clean slate every time
+  -> Cons: slower, if the object is heavy to create
+
+.AddScoped()
+  -> creates an instance once per web request and shares it (like having the same waiter as a restaurant)
+  -> Best for: creating databases context and user info
+
+.AddSingleton()
+  -> creates the instance once(when the program starts) and dosen't kill it
+  -> the object is created the first time it's requested and lives in memory from that point on, every file now shares it
+  -> Best for: Caching Services(keep the data in memory), configuraton settings and logging services
+
+==============================================================================================
+
+==============================================================================================
+Add() vs AddAsync()
+ Add()
+  -> this does not send an SQL statement to the database, that happenes when SaveChangesAsync() is called
+  -> this does 2 things:
+	1.Snapshotting (takes a snapshot of the current values so that it can detect changes later)
+	2.State Setting (sets the EntityState to Added)
+
+ AddAsync()
+  -> this method exists for Value Generators that need to talk to the database before the entity
+	is added to Change Tracker
+  -> Hi/Lo Algorithm : a optimization tehnique that reserves 1-100 IDs, so that it can insert
+	100 rows without asking the DB for an ID everytime.
+		       occasionally it runs out of reserved Ids, so it needs to ask the DB for the next
+				cluster. 
+
+!!!Use Add() 99% of the time!!!	
+==============================================================================================
 
