@@ -94,6 +94,7 @@
 ======IPv4 Address======
  ->
 ========================
+<<<<<<< Updated upstream
 
 
 ===========TCP(Transmission Control Protocol)===========
@@ -141,3 +142,5 @@ Examples that use UDP: VoIP(VoiceOverIP), Online gaming, Voice Chat, Streaming S
 ======Multiplexing======
  ->a method where multiple digital or analog signals are combined into one over a share medium
 ========================
+=======
+>>>>>>> Stashed changes

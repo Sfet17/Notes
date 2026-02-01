@@ -61,7 +61,7 @@
  -> description (something that describes that network, a name)
  -> no shutdown
  -> end
- -> copy running-config startup-config
+ -> copy running-config startup-config / write
 
 
 ======================================================
@@ -76,4 +76,6 @@
  -> exit
  -> ip default-gateway (the default gateway for the network)
 ================================
+
+Miruna, Alex, Rares, Glont, Zavragiu, Razvan, Chicea, Vio, Andreea, Denis, Iza
 

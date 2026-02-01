@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 ==============================================================================================
 Enumerable.Where Method
+=======
+Enumerable.Where Method
+
+>>>>>>> Stashed changes
 .Where()
  -> filters a sequence based on a predicate(function to verify each element for a condition)
  -> return an IEnumrable that contains the elements that fit that condition
@@ -15,6 +20,7 @@ foreach (string fruit in query)
 {
     Console.WriteLine(fruit);
 }
+<<<<<<< Updated upstream
 
  This code produces the following output:
 apple
@@ -24,17 +30,32 @@ apple
 ==============================================================================================
 
 ==============================================================================================
+=======
+/*
+ This code produces the following output:
+
+ apple
+ mango
+ grape
+*/
+
+>>>>>>> Stashed changes
 .RemoveRange(Object)
  -> tracks the given object in order to delete it from the database when SaveChanges() is applied.
  -> removes items by index
  -> retruns a void value
+<<<<<<< Updated upstream
 ==============================================================================================
 
 ==============================================================================================
+=======
+
+>>>>>>> Stashed changes
 .Remove(Object)
  -> it does the exact same thing
  -> removes an item by value
  -> it returns a bool statement
+<<<<<<< Updated upstream
 ==============================================================================================
 
 ==============================================================================================
@@ -177,4 +198,15 @@ Add() vs AddAsync()
 
 !!!Use Add() 99% of the time!!!	
 ==============================================================================================
+=======
+
+.ExecuteDelete()
+ -> deletes the data from the database directly without traking & selecting it 
+
+
+
+
+
+
+>>>>>>> Stashed changes
 

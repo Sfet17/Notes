@@ -1,0 +1,11 @@
+Mapping Error
+ I have to map the object fields aswell for the maping profile to work
+
+Ex:
+I wanted to map Dashboard to DashboardDto, but DashboardDto has a List of DashboardTabDto, 
+so i need to map DashboardTab to DashboardTabDto ,
+then DashboardTabDto has a List of WidgetDto so i need to map Widget to WidgetDto.
+
+I also need to configure the AutoMapper in Startup.cs for the program to know where to get the MappingConfiguration
+ services.AddAutoMapper(typeof(MappingProfile).Assembly);
+	
