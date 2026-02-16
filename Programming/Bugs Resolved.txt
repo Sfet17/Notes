@@ -101,6 +101,7 @@ Fix: disabling the source that required some credentials to bepassed through, in
 
 ===============================================================================================================
 Existing Data vs New Rules
+
  -> enstricting strict rules (like adding a foreign key) on data that is either dirty, incomplete or non existing
  -> it happened after a small restructuring of the database, when a new foreign key (to a table added in the new migration)
 	was added to an already existing table, but it was referencing no data since the new table added in the new migration
@@ -108,4 +109,40 @@ Existing Data vs New Rules
 
  Fix: Adding a default value(like 1) in the migration file, to the new table, so that the FK constraint will work
  Fix: Changing the model of LiveTables(the already existing table) to permit nullable values 
+===============================================================================================================
+
+
+===============================================================================================================
+The CREATE UNIQUE INDEX statement terminated because a duplicate key was found for the object name 'dbo.Employee' and the index name 'AK_Employee_ApplicationUserId'. 
+The duplicate key value is (test).
+ 
+ -> i had multiple values in the Employee table, but i was giving the default value to all of them for the newly added column
+	ApplicationUserId as 'test'
+ -> this failed because it was meant to be an UNIQUE INDEX, and it wasn't unique given the fact that everyone shared the same value
+
+ Fix: In the migration file, change a propriety when creating the new column like so: 
+	            migrationBuilder.AddColumn<string>(
+                	name: "ApplicationUserId",
+                	table: "Employee",
+                	type: "nvarchar(450)",
+                	nullable: false,
+                	defaultValueSql: "NEWID()"); <- this here is the fix, before it was set to: defaultValue: "test";
+ 
+ defaultValueSql: "NEWID()")
+	-> creates a new GUID for each new, or already created value stored in the database.
+
+===============================================================================================================
+
+
+===============================================================================================================
+Your target project 'Revolution.LiveTables.Api' doesn't match your migrations assembly 'Revolution.LiveTables.Model'. 
+Either change your target project or change your migrations assembly.
+Change your migrations assembly by using DbContextOptionsBuilder. E.g. options.UseSqlServer(connection, b => b.MigrationsAssembly("Revolution.LiveTables.Api")). 
+By default, the migrations assembly is the assembly containing the DbContext.
+Change your target project to the migrations project by using the Package Manager Console's Default project drop-down list, or by executing "dotnet ef" from the directory containing the migrations project.
+
+
+ -> this error happens when EF Core looks for the migartions folder inside the folder the command ran, but it can't find it
+
+ Fix: specify wher the folder is: --project ../REvolution.LiveTables.Models
 ===============================================================================================================

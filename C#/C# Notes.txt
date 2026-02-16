@@ -23,7 +23,7 @@ foreach (string fruit in query)
 <<<<<<< Updated upstream
 
  This code produces the following output:
-apple
+ apple
  mango
  grape
  
@@ -209,4 +209,24 @@ Add() vs AddAsync()
 
 
 >>>>>>> Stashed changes
+
+==============================================================================================
+FluentValidator
+ -> it's a dotnet library used to define validation rules for different objects in a clean
+	readable and reliable way
+ SETUP(in Program.Cs || Startup.Cs || HostingExtenstions.cs):
+	builder.Services.AddValidatorsFromAssemblyContaining<Validator_Example>();
+		-> looks in the enitre folder/projcet that the validator_example is in
+			for other validators(basicly any class that inherits AbstractValidator)
+	builder.Services AddFluentValidationAutoValidation();
+		-> it tells ASP.NET core to look at all the incoming HTTP requests, before it reaches
+			the controller endpoint, it checks if the incomming request is valid.
+==============================================================================================
+
+==============================================================================================
+Generics
+
+
+==============================================================================================
+
 

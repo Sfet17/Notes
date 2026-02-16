@@ -34,3 +34,42 @@ git add -u
 		git checkout <commit> <file_name> // git checkout <file_name>
 
 ==========================================================================================
+
+==========================================================================================
+git reset [<mode>] [<commit>]
+
+ -> changes which commit HEAD points to => this makes it posibile to unde some git operations
+	like commits, merge, rebase and pull
+ -> when files are specified , or using the argumetn --patch, git reset will update the staged
+	version of those files.
+
+[<mode>]
+ -> decides what to do with the working directory after running the command.
+ 	--mixed(by default)
+		-> working directory unchanged, update the index to match the new HEAD, so nothing will be staged.
+		-> good for unstaging work
+	--soft
+		-> can move multiple commit into one single commit
+			Ex: git reset --soft HEAD~3; git commit -m"" <- puts the last 3 commits into one.
+		-> can move changes from a branch to antoher:
+			Ex: i've been working on the wrong branch and before I push i realize i should've been o a different branch:
+				git reset --soft HEAD~1; git chechout branch_name
+			the files remain in the satging area while using git reset --soft
+		-> leaves your index (Staging Area) and Working Directory exactly as they were before you ran the reset.
+	--hard
+		-> overwrite all files and directories with the version from <commit>, and may overwrite untracked files.
+		-> update the index to match the new HEAD, so nothing will be staged.
+
+==========================================================================================
+
+
+==========================================================================================
+git restore [<options>]
+ 
+ -> restore working tree files
+ -> restore specifed part from the working tree with some contents from a restore source
+ -> restore contetn in the index with --staged, 
+	or resotre both the working and the index with --staged --worktree 
+ -> by default when --staged is given the contents are restored from HEAD, use --source to restore from a different commit
+
+==========================================================================================
