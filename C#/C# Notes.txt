@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 ==============================================================================================
 Enumerable.Where Method
 =======
@@ -198,17 +197,11 @@ Add() vs AddAsync()
 
 !!!Use Add() 99% of the time!!!	
 ==============================================================================================
-=======
 
+==============================================================================================
 .ExecuteDelete()
  -> deletes the data from the database directly without traking & selecting it 
-
-
-
-
-
-
->>>>>>> Stashed changes
+==============================================================================================
 
 ==============================================================================================
 FluentValidator
@@ -229,4 +222,43 @@ Generics
 
 ==============================================================================================
 
+========================================IQueryable============================================
+ -> .NET interface in System.LinQ that represents a collection of data that can be queried, 
+	with the query logic translated into antoher language(like SQL)
 
+ -> it creates a part of an SQL querry, making it efficent and reducing load on the server
+	since it can access the database ONLY for what is needed(by creating a specific querry with multiple parts)
+
+ -> the query is only executed when iteratting over the data or calling a terminal method
+	like FirstOrDefault(), Count(), ToList(), etc.
+
+ -> IQueyable inherits IEnumarable, so that the querry result can me enumarated
+
+
+==============================================================================================
+
+
+===============================================AutoMapper===================================================
+
+.ProjectTo<IEntity>(mapper.ConfigurationProvider)
+	-> instead of loading full entities in memory and them mapping them,
+		this translates the mapping configuration into an SQL SELECT Statement via IQueryable
+			(Map<T>() => SELECT * .. || ProjectTo<T>() => SELECT specific columns)
+	-> does not work with IQueryable, not IEnumerable or in memory collections
+
+	-> make a high traffic API faster and lighter
+
+
+============================================================================================================
+
+
+
+==============================================AsNoTraking()=================================================
+ -> every DbContext has a Change Tracker
+				-> an internal dictonary that logs carefully what was modified so that it knows
+					what to write into the database when SaveChanges() is applied
+ -> AsNoTracking() stops the specific entity to be snapshotted by the Change Tracker.
+ -> the main benefit of this is: less memory used, less strain and faster response
+ -> mainly used when fetching data from the database that won't be changed(like a GET endpoint)
+
+============================================================================================================

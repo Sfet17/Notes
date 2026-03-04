@@ -628,3 +628,35 @@ Learn what it does
 =====================================================================================================================
 
 
+
+=====Pagination=====
+ -> pasted some fucntions to look into
+
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace REvolution.API.Models.ViewModels;
+
+public class PaginatedItemsViewModel<TEntity>(int pageIndex, int pageSize, long count, IEnumerable<TEntity> data, object total)
+    where TEntity : class
+{
+    public int PageIndex { get; private set; } = pageIndex;
+
+    public int PageSize { get; private set; } = pageSize;
+
+    public long Count { get; private set; } = count;
+
+    public IEnumerable<TEntity> Data { get; private set; } = data;
+
+    [JsonConstructor]
+    public PaginatedItemsViewModel(int pageIndex, int pageSize, long count, IEnumerable<TEntity> data) : this(pageIndex, pageSize, count, data, null)
+    {
+    }
+
+    public object Total { get; set; } = total;
+}
+
+====================
+
+

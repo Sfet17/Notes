@@ -1,0 +1,14 @@
+---Difference Between Order By and Group By Clause in SQL---
+
+ 			---Group By---
+
+	-> used to group rows that have the same value
+ 	-> cannot be used in aggregate functions(MIN, MAX, AVG, etc)
+	-> used before OrderBy in Select statements
+	-> can be used in a Create View statement
+
+ 			---Order By ---
+	-> set the result in either ascending or descending order
+	-> used after GroupBy in Select Statements
+	-> can be used in aggregate functions
+	-> cannot be used in a CreateView statement
