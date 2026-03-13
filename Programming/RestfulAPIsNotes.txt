@@ -626,3 +626,73 @@ namespace Revolution.LiveTables.Api.Repositories.RoundsRepository
 
 Learn what it does
 =====================================================================================================================
+
+
+=====================================================================================================================
+
+
+using World.Model.Domain.Activity;
+using World.Portal.API.Database;
+
+namespace World.Portal.API.Repositories.Activity.AllActivityLog;
+
+public class AllActivityLogsRepository(WorldPortalContext context) : Repository<AllActivityLogs>(context), IAllActivityLogsRepository
+{
+    public async Task InsertIntoAllActivityLogs(string columnName, int Id)
+    {
+        AllActivityLogs entity = new();
+
+        var prop = entity.GetType().GetProperty(columnName);
+        if (prop != null && prop.CanWrite)
+        {
+            prop.SetValue(entity, Id);
+        }
+        else
+        {
+            throw new ArgumentException($"Property '{columnName}' does not exist or is not writable on AllActivityLogs.");
+        }
+        await context.AllActivityLogs.AddAsync(entity);
+        await context.SaveChangesAsync();
+    }
+}
+
+
+=====================================================================================================================
+
+
+=====================================================================================================================
+    public async Task InsertIntoAllActivityLogs(params (string ColumnName, int Value)[] properties)
+    {
+        if (properties == null || properties.Length == 0)
+        {
+            throw new ArgumentException("At least one property must be provided.", nameof(properties));
+        }
+
+        AllActivityLogs entity = new();
+
+        // Get the type once outside the loop for slight performance gain
+        Type entityType = entity.GetType();
+
+        foreach (var (columnName, value) in properties)
+        {
+            var prop = entityType.GetProperty(columnName);
+            if (prop != null && prop.CanWrite)
+            {
+                prop.SetValue(entity, value);
+            }
+            else
+            {
+                throw new ArgumentException($"Property '{columnName}' does not exist or is not writable on AllActivityLogs.");
+            }
+        }
+
+        await context.AllActivityLogs.AddAsync(entity);
+        await context.SaveChangesAsync();
+    }
+
+=====================================================================================================================
+
+
+
+TableSchedules and TableRecords, by tableId
+New branch, new collection

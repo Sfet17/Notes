@@ -242,6 +242,18 @@ alter table table_name modify column_name data_type;  -changes the datatype of a
 							+---------------+-------------+
  
 ------------------------------------------------------------------------------------------------------------------------------------------
+GROUP_CONCAT()
+ -> an aggregation function that combines data from multiple columns into a single string
+ -> multiple clauses can be used inside Group_Concat() function like:
+	-> DISTINCT: to eliminate repetiton from the result
+	-> ORDER BY: to show the result in an order
+	-> SEPARATOR: to declare the character/characters that will separate the date, like ", "
+
+SELECT * 
+GROUP_CONCAT(DISTINCT column ORDER BY column SEPARATOR ', ') AS "new column name"
+FROM table
+GROUP BY column_name
+
  
 --------------------------------------------------------------------------------------------------------------------------------------------
 

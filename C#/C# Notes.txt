@@ -3,7 +3,6 @@ Enumerable.Where Method
 =======
 Enumerable.Where Method
 
->>>>>>> Stashed changes
 .Where()
  -> filters a sequence based on a predicate(function to verify each element for a condition)
  -> return an IEnumrable that contains the elements that fit that condition
@@ -38,7 +37,6 @@ foreach (string fruit in query)
  grape
 */
 
->>>>>>> Stashed changes
 .RemoveRange(Object)
  -> tracks the given object in order to delete it from the database when SaveChanges() is applied.
  -> removes items by index
