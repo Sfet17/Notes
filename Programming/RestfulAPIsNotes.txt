@@ -693,6 +693,14 @@ public class AllActivityLogsRepository(WorldPortalContext context) : Repository<
 =====================================================================================================================
 
 
+=====================================================================================================================
+    public async Task<PaginatedItemsViewModel<ActivityLogDto>> GetAllUserActivity(string userId, int pageSize, int pageIndex)
+    {
+        var count = await activityLogRepository.CountAllActivityLogsAUserHas(userId);
+        var paginatedLogs = activityLogRepository.GetForUser(userId, pageSize, pageIndex);
+        var paginatedLogsDto = await paginatedLogs
+            .ProjectTo<ActivityLogDto>(mapper.ConfigurationProvider).ToListAsync();
 
-TableSchedules and TableRecords, by tableId
-New branch, new collection
+        return new PaginatedItemsViewModel<ActivityLogDto>(pageIndex, pageSize, count, paginatedLogsDto);
+    }
+=====================================================================================================================

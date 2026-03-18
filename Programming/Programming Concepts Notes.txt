@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
 ===================================================================================================================
-=======
->>>>>>> Stashed changes
 Eager Loading 
  -> loads all the necessary data, including related data, without waiting for it to be requested
  -> beneficial for performance as it reduces the number of database calls needed
@@ -32,18 +29,14 @@ Ex:
 		it will soon run out of "waiters"(working threads) to take the "orders"(HTTP Requests)
  ->using an async methods solves this problem somewhat, given the fact that when a thread is given a specifc task, it can be used for something else aswell
 		(like waiter who places and order and then goes back to place more orders; the order he places can be given to the customers by him, or other waiters)
-<<<<<<< Updated upstream
+
 ===================================================================================================================
 
 ===================================================================================================================
-=======
-
->>>>>>> Stashed changes
 Sync VS Aysnc
 
 
 
-<<<<<<< Updated upstream
 ===================================================================================================================
 
 ===================================================================================================================
@@ -52,7 +45,6 @@ Batch Processing/Bulk Insert
 ====================================================================================================================
 
 ====================================================================================================================
-=======
 
 ========================================================================
 Batch Processing/Bulk Insert 
@@ -61,7 +53,6 @@ Batch Processing/Bulk Insert
 ========================================================================
 
 ========================================================================
->>>>>>> Stashed changes
 Cache vs Database
 -------------------
  -> i had a bug now where my code was looking in the cache but not in the database so it would add the same thing more times(a permission someone should only have once, it the cache it wasnt but it the database it was and it kept adding it)
@@ -147,6 +138,41 @@ Entity vs Dtos(Repository Files)
  -> repository files (for example in C#) are made to handle the entity data, the raw model, closest to the datbase
 
 ====================================================================================================================
-=======
-========================================================================
->>>>>>> Stashed changes
+
+
+====================================================================================================================
+Reference Types vs Value Types
+
+	!!! They determine how data is stored and manipulated in memory!!!
+ -> Reference type of variable stores the value as address(like a pointer in C++) /direction to get to the information 
+	-> every change made to a reference type is going to show in all others that use it:
+		Ex: Person person1.Name = new Person(); person1.Name = "Test1"; Person person2 = person1;person1.Name = "Test2"
+			Console: person1.Name -> Test2 ; person2.Name -> Test2
+ -> Reference Types are stored on the heap memory
+
+ -> Value Type is the value is the information itself
+	-> changes made only show where it was changed
+		Ex: int var1 = 100; int var2 = var1; var1 = 200;
+			Console: var1 -> 200; var2 -> 100;
+ -> Value Types are stored on the stack memory
+
+Built in Types:
+	Reference Types: object, string, dynamic
+	Value Types: int, float, bool, char
+
+User Defined Types:
+	Reference Types: classes, interfaceses, records
+	Value Types: enums, structs 
+
+
+
+====================================================================================================================
+
+
+====================================================================================================================
+Heap vs Stack Memory
+
+
+
+====================================================================================================================
+

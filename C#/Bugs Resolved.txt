@@ -8,4 +8,60 @@ then DashboardTabDto has a List of WidgetDto so i need to map Widget to WidgetDt
 
 I also need to configure the AutoMapper in Startup.cs for the program to know where to get the MappingConfiguration
  services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+
+============================================================================================================================
+16.03.2026
+
+ This was the situation i had, i was trying to configure a model ActivityLogs that had two fields from the same object.
+
+  ApplicationUser.
+	ActivityLogs:
+
+	    	public string AffectedUserId { get; set; }
+   		public ApplicationUser AffectedUser { get; set; }
+		public string UserId { get; set; }
+    		public ApplicationUser User { get; set; }
+
+	ApplicationUser:
+		ICollection<ActivityLogs> ActivityLogs {get; set;}
+
+			
+ 
+ EF Core cannot map the navigation AffectedUser because it cannot determine which relationship that navigation corresponds to,
+	since there are two navigation proprieties for ApplicationUser while it's only exposing a single collection of ActivityLogs,
+		so EF cannot decide whether that collection is the inverse for AffectedUser or for User.
+
+The fix:
+ When multiple relationships exist between the same two types, EF requires explicit configuration.
 	
+	1.Set different collections in ApplicationUser for ActivityLogs:
+		 ICollection<ActivityLogs> UserActivityLogs {get; set;}
+		 ICollection<ActivityLogs> AffectedUserActivityLogs {get; set;}
+	
+	2.Use InversePropriety in ActivityLogs:
+		[InversePropriety(nameof(ApplicationUser.AffectedUserActivityLogs))]
+		public ApplicationUser AffectedUser { get; set; }
+		[InversePropriety(nameof(ApplicationUser.UserActivityLogs))]
+		public ApplicationUser User { get; set; }
+
+	3.Configure it explicitly in OnModelCreating(ModelBuilder)(FluentAPIs)
+		modelBuilder.Entity<ActivityLog>()
+    			.HasOne(al => al.AffectedUser)
+    			.WithMany(u => u.AffectedUserActivityLogs) 
+    			.HasForeignKey(al => al.AffectedUserId)
+    			.OnDelete(DeleteBehavior.Restrict);
+
+		modelBuilder.Entity<ActivityLog>()
+    			.HasOne(al => al.User)
+    			.WithMany(u => u.UserActivityLogs) 
+    			.HasForeignKey(al => al.UserId)
+    			.OnDelete(DeleteBehavior.Restrict);
+		
+ 
+!!!EF infers relationships by matching navigation properties and foreign-key properties (or inverse navigation collections)!!!
+
+.InversePropriety()
+ -> Specifies the inverse of a navigation property that represents the other end of the same relationship.
+
+============================================================================================================================
