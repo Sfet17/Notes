@@ -1,0 +1,32 @@
+
+=====================================================================================================================
+How does a web API handle a standard HTTP request versus how a background service operates within the .NET runtime?
+-------------------------------------------------------------------------------------------------------------------
+1. The Standard HTTP Request Lifecycle (Web API)
+  !When a user hits an endpoint in the controller that is an external trigger!
+	-> The Kestrel recives a TCP packet, parses the HTTP request, and askes ASP.NET ThreadPool a worker to handle it
+		(this is the endpoint in the controller)
+	-> The MiddleWare: The request travles through the middleware(auth, rounting, etc)
+	-> The Scope: The .NET DI container creates a Scope for this request.The context is registered as a Scoped service.
+		=> every class that asks for the context in this request recievs the same instance of it.
+	-> The Teardown: After a response code is sent, an HTTP response is sent over the wire, the thread goes back to the 
+		ThreadPool & the DI container disposes of the scope. The context is destroyed , releasing the database connection
+			back to the connection Pool
+!Web APis are meant to be short-lived.They should do their job and die quickly!
+
+2.The Background Service
+ !A Background Service is fundamentally different. It is an internal trigger!
+	-> The Startup : Before recivng any HTTP requests, it start the registered background services
+	-> The Loop: It spins in a long-running Task, that sits in a while loop till the application stops
+	-> The Scope: They are registered as Sigleton => the live forever.
+	
+
+!Captive Dependency!
+	=> refers to a misconfiguration of service lifeteimes, it happens when a loger lived service
+		holds hostage a shorter lived service leading to a DoS(Denial of Service)
+
+
+
+=====================================================================================================================
+ Kestrel = lightweight, cross-platform and high performance async web server for ASP.NET, making it ideal
+		for containerized microservices, often used behind a reverse proxy like Nginx

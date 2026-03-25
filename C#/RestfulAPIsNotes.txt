@@ -660,3 +660,97 @@ public class PaginatedItemsViewModel<TEntity>(int pageIndex, int pageSize, long 
 ====================
 
 
+
+=====================================================================================================================
+DtoValidationHelper
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace World.Model.Domain.DtoValidationHelper;
+
+public static class DtoValidationHelper 
+{
+    public static Func<string, bool>GetEnumValidationExpression<TEnum>(bool ignoreCase = false) where TEnum : struct, Enum
+    {
+        return (string value) =>
+        {
+            if (Enum.TryParse<TEnum>(value, ignoreCase, out TEnum result))
+            {
+                return Enum.IsDefined(result);
+            }
+            return false;
+        };
+    }    
+
+    public static string GetEnumValidationMessage<T>(string fieldName) where T : struct, Enum
+    {
+        var enumValuesList = string.Join(", ", Enum.GetValues<T>().Select(value => value.ToString()).ToList());
+        return $"Invalid value for {fieldName}. Possible values are: {enumValuesList}";
+    }
+}
+
+
+And its uses/Examples:
+using FluentValidation;
+using System.ComponentModel.DataAnnotations.Schema;
+using World.Model.Domain;
+using World.Model.Domain.DtoValidationHelper;
+using World.Portal.API.Models.Enums;
+
+namespace World.Portal.API.Models.Dto.DynamicFees;
+
+public class DynamicFeeCreateEditDto
+{
+    public string DynamicFeeBase { get; set; }
+    [Column(TypeName = "decimal(16,4)")]
+    public decimal DynamicFeeValue { get; set; }
+    [Column(TypeName = "decimal(16,4)")]
+    public decimal DynamicFeeMin { get; set; }
+    [Column(TypeName = "decimal(16,4)")]
+    public decimal DynamicFeeMax { get; set; }
+    public int DynamicFeeCurrencyId { get; set; }
+    public string DynamicFeeTimeFrame { get; set; }
+}
+
+public class DynamicFeeValidator : AbstractValidator<DynamicFeeCreateEditDto>
+{
+    public DynamicFeeValidator()
+    {
+        RuleFor(x => x.DynamicFeeValue).GreaterThan(0).WithMessage("Dynamic fee base value must be greater than or equal to 0.");
+        RuleFor(x => x.DynamicFeeMin).GreaterThan(0).WithMessage("Dynamic fee min must be greater than or equal to 0.");
+        RuleFor(x => x.DynamicFeeMax).GreaterThan(x => x.DynamicFeeMin).WithErrorCode("Dynamic fee max must be greater than dynamic fee min.");
+
+        RuleFor(x => x.DynamicFeeTimeFrame).Must(tf => DtoValidationHelper.GetEnumValidationExpression<TimeFrameEnum>(true).Invoke(tf))
+                                           .WithMessage(DtoValidationHelper.GetEnumValidationMessage<TimeFrameEnum>("Dynamic fee time frame"));
+        RuleFor(x => x.DynamicFeeBase).Must(db => DtoValidationHelper.GetEnumValidationExpression<PricingBaseEnum>(true).Invoke(db))
+            .WithMessage(DtoValidationHelper.GetEnumValidationMessage<PricingBaseEnum>("Dynamic fee base"));
+    }
+}
+
+
+namespace World.Portal.API.Models.Enums;
+
+public enum TimeFrameEnum
+{
+    Day,
+    Week,
+    Month
+}
+
+
+namespace World.Portal.API.Models.Enums;
+
+public enum PricingBaseEnum
+{
+    GGR,
+    TotalBet
+}
+
+
+=====================================================================================================================
+
+
