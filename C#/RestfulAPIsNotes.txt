@@ -751,6 +751,16 @@ public enum PricingBaseEnum
 }
 
 
+GetEnumValidationExpression<TEnum> Syntax Explained:
+ -> Instead of validatidating a string directly, it returns a rule that can be applied later
+	public static Func<string, bool>
+		-> return a function that takes a string as an input and retruns a bool as a result
+	where TEnum : struct, Enum
+		-> ensures that it only works with Enums
+	bool ignoreCase = false
+		-> this is a param that decides if the function should be case sensitve or not
+
+
 =====================================================================================================================
 
 

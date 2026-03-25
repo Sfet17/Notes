@@ -132,6 +132,7 @@ Enum.TryParse(look more into it and exercise using it)
 
 ==============================================================================================
 TryParse vs Parse
+ -> it is a method that converts a string into another type of variable like an int,double,Enums, etc.
 
 Parse
  -> throws an exception if it cannot parse the value
@@ -258,5 +259,21 @@ Generics
  -> AsNoTracking() stops the specific entity to be snapshotted by the Change Tracker.
  -> the main benefit of this is: less memory used, less strain and faster response
  -> mainly used when fetching data from the database that won't be changed(like a GET endpoint)
+
+============================================================================================================
+
+
+
+============================================================================================================
+Delegates
+ -> an object that represents a method
+ -> allows to treat a method as a value, assigning a method to a value, passing it to other methods as params,etc.
+
+============================================================================================================
+
+
+============================================================================================================
+Reflection
+ -> it's the concept of writting code that can basically inspect various aspects about the code itself
 
 ============================================================================================================
