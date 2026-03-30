@@ -1,0 +1,11 @@
+----Linux Notes----
+
+!!EVERYTHING in Linux is a file!!
+
+1.Kernel
+  -> it's a safeguarded place that manages hardware,memory, procceses and the system calls
+   --TODO: learn more about the Kernel
+
+2.The Shell/Daemons(User Space) 
+  -> everyhting outside the kernel live here, they must ask the kernel for permission via "System Calls"
+
