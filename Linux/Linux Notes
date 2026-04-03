@@ -9,3 +9,11 @@
 2.The Shell/Daemons(User Space) 
   -> everyhting outside the kernel live here, they must ask the kernel for permission via "System Calls"
 
+3.Hypervisors
+  -> software that allows multiple VMs to run on a hardware device like a server or computer
+  -> there are 2 types of Hypervisors(Hosted and Local => for more info see service management folder)
+    How to install a hypervisor on Arch?(Local)
+      1.Check if the CPU is up for Virtualization
+        lscpu | grep Virtualization
+         -> if nothing shows it might be disabled from the bios
+      

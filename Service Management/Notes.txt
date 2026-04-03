@@ -1,0 +1,3 @@
+Hypervisor
+  -> it's a sowftware that allows multiple Virtual Machines to run on a singular hardware device(like a server or computer)
+  -> it manages hardware efficiency , ensuring that every VM runs soomthly and idependenty.
