@@ -764,3 +764,81 @@ GetEnumValidationExpression<TEnum> Syntax Explained:
 =====================================================================================================================
 
 
+=====================================================================================================================
+
+public record SlotStudioDeletedEvent
+(
+ Guid EventId,
+ DateTime TimeFrame,
+ string UserId,
+ int EnterpriseAccountId,
+ int SlotStudioId,
+ string SlotStudioName
+)
+
+
+JSON:
+SlotStudioCreatedEvent:
+{
+ "EventId" : "asdasda",
+ "TimeFrame" : "2026-04-03T11:58:17Z",
+ "UserId" : "example",
+ "EnterpriseAccoundId" : 1,
+ "SlotStudioId" : 23,
+ "SlotStudioName" : "Lucky 47" 
+}
+
+
+using System.Text.Json
+
+private async Task ProcessMessageAsync(string rawJsonMessage, WorldPortalContext context)
+{
+ var incomingEvent = JsonSerializer.Deserialize<SlotStudioDeletedEvent>(rawJsonMessage);
+ if(incomingEvent == null)
+  throw new InvalidOperationException(....);
+ var activityLog = new ActivityLog
+    {
+        UserId = incomingEvent.UserId,
+        EnterpriseAccountId = incomingEvent.EnterpriseAccountId,
+        SlotStudioId = incomingEvent.SlotStudioId,
+        TimeStamp = incomingEvent.TimeFrame,
+        ActionType = "Delete",
+        ActionDetail = $"Deleted slot studio with ID {incomingEvent.SlotStudioId}",
+        ActionExtraInfo = $"Slot Studio Name: {incomingEvent.SlotStudioName}"
+    };
+ context.ActivityLogs.Add(activityLog);
+ await context.SaveChangesAsync();
+
+}
+
+public class SlotStudioCreatedConsumer : BackgroundService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    // 1. INJECT the factory here. Do NOT create the scope here.
+    public SlotStudioCreatedConsumer(IServiceScopeFactory scopeFactory)
+    {
+        _scopeFactory = scopeFactory;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // (RabbitMQ channel setup goes here...)
+        
+        consumer.Received += async (model, ea) =>
+        {
+            var body = ea.Body.ToArray();
+            var rawJsonMessage = Encoding.UTF8.GetString(body);
+
+            // 2. CREATE the scope here, per message.
+            using var scope = _scopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<WorldPortalContext>();
+
+            // 3. Process the message using the scoped context
+            await ProcessMessageAsync(rawJsonMessage, dbContext);
+        };
+    }
+}
+
+=====================================================================================================================
+

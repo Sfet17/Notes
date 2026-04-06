@@ -30,3 +30,102 @@ How does a web API handle a standard HTTP request versus how a background servic
 =====================================================================================================================
  Kestrel = lightweight, cross-platform and high performance async web server for ASP.NET, making it ideal
 		for containerized microservices, often used behind a reverse proxy like Nginx
+
+
+=====================================================================================================================
+Dependency Injection Container
+ -> it's like a giant factory and dictionary combined.
+ -> when the program starts it runs the rules of dependecies wirtten before:
+	builder.Services.AddScoped<IExample, Example>();
+		-> this line creates the dependency between IExample and Example
+		-> if anyone asks for a IExample -> we should build them an Example
+			and keep it alive for the scope of this HTTP request
+
+
+I.
+public class ClassName : BackgroundService
+{
+
+	private readonly IServiceScopeFactory _scopeFactory;
+	public ClassName(ISerivceScopeFactory scopeFactory)
+		{
+			_scopeFactory = scopeFactory;
+		}
+
+}
+		-> private readonly IServiceScopeFactory _scopeFactory; creates an empty parking space in your class.
+		-> public ClassName(IServiceScopeFactory scopeFactory) is the loading dock. The DI container hands the object to this parameter.
+		-> _scopeFactory = scopeFactory; parks the object into the parking space so the rest of your class methods can use it.
+ 
+II.
+public class ClassName(IServiceScopeFactory scopeFactory) : BackgroundService
+{ ... }
+
+
+I. and II. are the same thing, it creates a space for the scope factory, loads the object and set it up in the right space to use it
+=====================================================================================================================
+
+=====================================================================================================================
+JSON Deserialization
+
+
+=====================================================================================================================
+
+=====================================================================================================================
+Transactional Outbox Patternp
+
+=====================================================================================================================
+
+=====================================================================================================================
+Dead Letter Queue (DLQ)
+
+
+=====================================================================================================================
+
+=====================================================================================================================
+Separation of Concerns.
+
+=====================================================================================================================
+
+=====================================================================================================================
+Domain Events.
+
+=====================================================================================================================
+
+
+=====================================================================================================================
+RabbitMQ
+	
+---------------------------------------------------------------------------------------------------------------------
+ RabbitMQ Automatic Acknowledgement(autoAck)
+	-> rabbitMq uses an acknowledgement to know if the message was succsessfully 
+		processed by a consumer.Until the message is acknowledged rabbitMQ holds onto it
+	-> autoAck: true
+		-> rabbitMQ marks the message as delivered and done the moment its send to a consumer
+		-> before the code is even ran
+				RabbitMQ ──sends message──► Consumer
+         			◄──auto ack────────  (immediately, automatically)
+					// Your code then runs... but RabbitMQ no longer cares about the outcome
+	-> autoAck: false
+		-> rabbitMQ holds the message untill it recieves from the code a message saying
+			that basically says that it's done.
+
+				RabbitMQ ──sends message──► Consumer
+                              			// your code runs...
+         			◄──manual ack──────  (only after successful processing)
+		-> have full atonomy where and when the ack is sent
+		
+!How to sent an ack statement in C#!
+	✅ Success — tell RabbitMQ "done, discard this message"
+		await channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
+
+ 	❌ Failure — tell RabbitMQ "something went wrong"
+		await channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true);
+                                                            			^^^^^^^^^^^
+                                         		requeue: true  → put it back in the queue
+                                         		requeue: false → discard / send to dead-letter queue
+
+		
+---------------------------------------------------------------------------------------------------------------------
+=====================================================================================================================
+
