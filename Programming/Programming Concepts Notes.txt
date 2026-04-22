@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
 ===================================================================================================================
-=======
->>>>>>> Stashed changes
 Eager Loading 
  -> loads all the necessary data, including related data, without waiting for it to be requested
  -> beneficial for performance as it reduces the number of database calls needed
@@ -32,18 +29,14 @@ Ex:
 		it will soon run out of "waiters"(working threads) to take the "orders"(HTTP Requests)
  ->using an async methods solves this problem somewhat, given the fact that when a thread is given a specifc task, it can be used for something else aswell
 		(like waiter who places and order and then goes back to place more orders; the order he places can be given to the customers by him, or other waiters)
-<<<<<<< Updated upstream
+
 ===================================================================================================================
 
 ===================================================================================================================
-=======
-
->>>>>>> Stashed changes
 Sync VS Aysnc
 
 
 
-<<<<<<< Updated upstream
 ===================================================================================================================
 
 ===================================================================================================================
@@ -61,12 +54,10 @@ Batch Processing/Bulk Insert
 ========================================================================
 
 ========================================================================
->>>>>>> Stashed changes
 Cache vs Database
 -------------------
  -> i had a bug now where my code was looking in the cache but not in the database so it would add the same thing more times(a permission someone should only have once, it the cache it wasnt but it the database it was and it kept adding it)
  -> very importnat to invalidate the cache so that the databse and the cache are synced up
-<<<<<<< Updated upstream
 ====================================================================================================================
 
 ====================================================================================================================
@@ -147,7 +138,6 @@ Entity vs Dtos(Repository Files)
  -> repository files (for example in C#) are made to handle the entity data, the raw model, closest to the datbase
 
 ====================================================================================================================
-<<<<<<< HEAD
 
 
 ====================================================================================================================
@@ -185,11 +175,3 @@ Heap vs Stack Memory
 
 
 ====================================================================================================================
-
-table for gap between Policy Model
-
-=======
-=======
-========================================================================
->>>>>>> Stashed changes
->>>>>>> b14a0a6 (Revert "Wrote a bit about Reference Types and Value Types.")

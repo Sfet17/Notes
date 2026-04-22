@@ -693,6 +693,169 @@ public class AllActivityLogsRepository(WorldPortalContext context) : Repository<
 =====================================================================================================================
 
 
+===================================================================================================================================
+Requierment: 
+ I had to create a POST api in order to create a new pricing policy model using one big JSON, that uses multiple 
+	objects(DTOs) from different tables, while the pricing policy model only holds a few necessary FK to some of those tables.
+-----------------------------------------------------------------------------------------------------------------------------------
 
-TableSchedules and TableRecords, by tableId
-New branch, new collection
+I needed to make a few changes to the DTOs in question.
+	I.I needed to change the fields in the PricingPolicyModelCreateEditDto to accept different CreateDtos when needed:
+			public class PricingPolicyModelCreateEditDto
+			{		...
+			  	public CurrencyDto OneTimeFeeCurrency {get; set;}
+				public PolicyFeeGroupCreateEditDto PolicyFeesGroup { get; set; }
+				public DiscountCreateEditDto Discount { get; set; }
+				public CurrencyDto WarrantyCurrency {  get; set; } 
+			}
+	!Then do the same for other needed Dtos, like for PolicyFeeGroupCreateEditDto that has a ICollection of MembershipsCreateDto
+			that needs to have a field for FeesCreateEditDto!
+	
+	II.Create the needed MappingConfiguration
+	  !In order not to have EntityTracker errors, we need to Ignore objects that are already created(read more about Change Entity Tracker)!
+		For those already existing in the database(like CurrencyDTO, where we just have to get it and then insert it):
+			CreateMap<PricingPolicyModelCreateEditDto, PricingPolicyModel>
+				.ForMember(dest => dest.WarrantyCurrency, opt => opt.Ignore())
+				.ForMember(dest => dest.OneTimeFeeCurrency, opt => opt.Ignore())
+	 Then we need to map the right FK constraint from the Dto to the model, since the DTO does not contain the id field directly
+			CreateMap<PricingPolicyModelCreateEditDto, PricingPolicyModel>
+				.ForMember(dest => dest.WarrantyCurrency, opt => opt.Ignore())
+				.ForMember(dest => dest.OneTimeFeeCurrency, opt => opt.Ignore())
+				.ForMember(dest => dest.OneTimeFeeCurrencyId, opt => opt.MapFrom(source => source.OneTimeFeeCurrency.Id))
+				.ForMember(dest => dest.WarrantyCurrencyId, opt => opt.MapFrom(source => source.WarrantyCurrency.Id)
+
+
+===================================================================================================================================
+
+
+===================================================================================================================================
+DbSeeder
+--------------------------------------------------------------------------------------------
+ -> used to instantiate some data for the database when the program is ran the first time
+--------------------------------------------------------------------------------------------
+
+
+using Revolution.GamingTables.Api.Database;
+using Revolution.LiveTables.Model.Domain;
+
+
+namespace Revolution.LiveTables.Api.Utils;
+public class DbInitializer
+{
+    public void SeedDatabase(RevolutionGamingTablesContext context)
+    {
+        context.Database.EnsureCreated();
+        var roundStageTypes = new List<string>
+        {
+            "Test1",
+            "Test2",
+            "Test3"
+        };
+
+        foreach(var typeName in roundStageTypes)
+        {
+            var exists = context.RoundStageTypes.FirstOrDefault(tp => tp.Name == typeName);
+            if (exists == null)
+            {
+                var newType = new RoundStageType
+                {
+                    Name = typeName,
+                };
+                context.RoundStageTypes.Add(newType);
+
+            }
+        }
+        var tableStatuses = new List<string>
+        {
+            "Online",
+            "Offline",
+            "Maintenance"
+        };
+        foreach (var virtualStatus in tableStatuses)
+        {
+            if (!context.TableStatuses.Any(ls => ls.Name.ToLower().Trim() == virtualStatus.ToLower().Trim()))
+            {
+                var newStatus = new TableStatus
+                {
+                    Name = virtualStatus,
+                };
+                context.TableStatuses.Add(newStatus);
+            }
+
+        }
+
+        var currencies = new List<(string Code, string Name)>
+        {
+            ("USD", "United States Dollar"),
+            ("EUR", "Euro"),
+            ("GBP", "British Pound"),
+        };
+
+        foreach (var currency in currencies)
+        {
+            if(!context.Currencies.Any(c => c.Code == currency.Code))
+            {
+                context.Currencies.Add(new Currency
+                {
+                    Code = currency.Code,
+                    Name = currency.Name
+                });
+            }
+        }
+
+        var roleNames = new List<string>
+        {
+            "Admin",
+            "Dealer",
+            "Technician",
+            "Pitboss",
+            "Shift Manager"
+        };
+
+        foreach (var roleName in roleNames)
+        {
+            if (!context.Roles.Any(r => r.Name.ToLower().Trim() == roleName.ToLower().Trim()))
+            {
+                context.Roles.Add(new Model.Domain.Identity.ApplicationRole
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    Name = roleName,
+                    NormalizedName = roleName.ToUpper()
+                });
+            }
+        }
+
+        context.SaveChanges();
+    }
+}
+
+ -> this must be called in HostingExtensions and :
+using Revolution.GamingTables.Api.Database;
+namespace Revolution.LiveTables.Api.Utils;
+public static class DbInitializerExtensions
+{
+    public static IHost SeedPermissions(this IHost app)
+    {
+        var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+        using var scope = scopeFactory.CreateScope();
+        var services = app.Services;
+        var dbInitializer = services.GetRequiredService<DbInitializer>();
+        try
+        {
+            var context = scope.ServiceProvider.GetRequiredService<RevolutionGamingTablesContext>();
+            dbInitializer.SeedDatabase(context);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        return app;
+    }
+}
+
+ and this function is later called in Program.cs as : app.SeedPermissions();
+
+
+
+===================================================================================================================================
